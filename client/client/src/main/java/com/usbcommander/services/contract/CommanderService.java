@@ -1,14 +1,14 @@
-package com.usbcommander.manager.contract;
+package com.usbcommander.services.contract;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class Service implements Runnable{
-    public static Set<Service> serviceList = new HashSet<>();
+public abstract class CommanderService implements Runnable{
+    public static Set<CommanderService> serviceList = new HashSet<>();
     protected boolean running;
 
 
-    private Service(){}
+    protected CommanderService(){}
 
     @Override
     public abstract void run();
@@ -17,7 +17,7 @@ public abstract class Service implements Runnable{
         try{
             run();
             running = true;
-            Service.serviceList.add(this);
+            CommanderService.serviceList.add(this);
             return true;
         } catch(Exception ex){
             return false;

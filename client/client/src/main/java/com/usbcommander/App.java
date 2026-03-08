@@ -1,12 +1,12 @@
 package com.usbcommander;
 
-import com.usbcommander.interactor.RegistryInteractor;
+import com.usbcommander.config.MachineConfig;
 
 /**
  * Hello world!
  */
 public class App {
     public static void main(String[] args) {
-        System.out.println(new RegistryInteractor().getAccessValue());
+        MachineConfig config = MachineConfig.getInstance();
     }
 }
