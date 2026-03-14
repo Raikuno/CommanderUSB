@@ -1,4 +1,4 @@
-package com.usbcommander.static_classes;
+package com.usbcommander.managers;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -10,23 +10,22 @@ import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.Kernel32Util;
 import com.sun.jna.platform.win32.Win32Exception;
 import com.sun.jna.platform.win32.WinBase;
-import com.sun.jna.platform.win32.WinReg;
 import com.sun.jna.platform.win32.WinReg.HKEY;
 import com.sun.jna.ptr.IntByReference;
+import com.usbcommander.AppConst;
 
-public abstract class RegistryInteractor{
-    private static final int ENABLE_VALUE = 3;
-    private static final int DISABLE_VALUE = 4;
-    private static final String usbenum = "SYSTEM\\CurrentControlSet\\Services\\USBSTOR\\Enum";
-    private static final String usbstor = "SYSTEM\\CurrentControlSet\\Services\\USBSTOR";
-    private static final HKEY location = WinReg.HKEY_LOCAL_MACHINE;
-
+public abstract class UsbRegistryManager{
+    private static int enable = AppConst.RegistryReferences.ENABLE_VALUE;
+    private static int disable = AppConst.RegistryReferences.DISABLE_VALUE;
+    private static String usbenum = AppConst.RegistryReferences.USB_ENUM;
+    private static String usbstor = AppConst.RegistryReferences.USB_STOR;
+    private static HKEY mainLocation = AppConst.MAIN_LOCATION;
     /**
      * This method checks the usb storage units connected to the machine and returns an array with the name, the drive letter assigned to the unit and the serial of every unit.
      * It does not need the registry value to be 'open'
      * @return An array with the name, the drive letter assigned to the unit and the serial of each connected usb storage unit
      */
-    public static Object[] getConnectedDrives(){
+    public static List<Map<String, String>> getConnectedDrives(){
         List<Map<String, String>> result = new ArrayList<>();
         String[] driveLetters = Kernel32Util.getLogicalDriveStrings().toArray(new String[0]);
         for (String value:driveLetters) {
@@ -49,7 +48,7 @@ public abstract class RegistryInteractor{
                 }
         }
 
-        return result.toArray();
+        return result;
     }
 
     /**
@@ -62,7 +61,7 @@ public abstract class RegistryInteractor{
 
         while (!exit) {
             try{
-                Advapi32Util.registryGetStringValue(location, usbenum, String.valueOf(count));
+                Advapi32Util.registryGetStringValue(mainLocation, usbenum, String.valueOf(count));
                 count += 1;
             }catch(Win32Exception err){
                 exit = true;
@@ -79,7 +78,7 @@ public abstract class RegistryInteractor{
     public static int getAccessValue(){
         String keyValue = "Start";
         try{
-            return Advapi32Util.registryGetIntValue(location, usbstor, keyValue);
+            return Advapi32Util.registryGetIntValue(mainLocation, usbstor, keyValue);
         }catch(Win32Exception err){
             //TODO Add a way to save the error on a log
             return -1;
@@ -94,8 +93,8 @@ public abstract class RegistryInteractor{
     public static boolean enableAccess(){
         String keyValue = "Start";
         try{
-            Advapi32Util.registrySetIntValue(location, usbstor, keyValue, ENABLE_VALUE);
-            return getAccessValue() == ENABLE_VALUE;
+            Advapi32Util.registrySetIntValue(mainLocation, usbstor, keyValue, enable);
+            return getAccessValue() == enable;
         }catch(Win32Exception err){
             //TODO Add a way to save the error on a log
             return false;
@@ -110,8 +109,8 @@ public abstract class RegistryInteractor{
     public static boolean disableAccess(){
         String keyValue = "Start";
         try{
-            Advapi32Util.registrySetIntValue(location, usbstor, keyValue, DISABLE_VALUE);
-            return getAccessValue() == DISABLE_VALUE;
+            Advapi32Util.registrySetIntValue(mainLocation, usbstor, keyValue, disable);
+            return getAccessValue() == disable;
         }catch(Win32Exception err){
             //TODO Add a way to save the error on a log
             return false;
