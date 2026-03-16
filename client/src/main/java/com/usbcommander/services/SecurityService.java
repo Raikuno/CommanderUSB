@@ -8,6 +8,7 @@ import com.sun.jna.platform.win32.WinReg.HKEYByReference;
 import com.usbcommander.AppConst;
 import com.usbcommander.config.MachineConfig;
 import com.usbcommander.managers.DriveManager;
+import com.usbcommander.managers.StatusManager;
 import com.usbcommander.managers.UsbRegistryManager;
 import com.usbcommander.services.contract.CommanderService;
 
@@ -18,6 +19,41 @@ public class SecurityService extends CommanderService{
     private boolean expectedChange = false;
 
     private boolean enumListenerFix = false;
+
+    private Thread usbStorListener;
+
+    private Thread usbEnumListener;
+
+    private Thread appConfigListener;
+
+
+    private SecurityService(){
+        usbStorListener = setListenerOn(AppConst.RegistryReferences.USB_STOR, () -> {
+            if(!expectedChange){
+                DriveManager.removeExternalDrives();
+                forceClose();
+                System.out.println("Stor changed");
+            } else {
+                expectedChange = false;
+            }
+            //TODO Add the log
+        }, true);
+        
+        usbEnumListener = setListenerOn(AppConst.RegistryReferences.USB_ENUM, () -> {
+            if(!enumListenerFix){
+                System.out.println("Enum changed");
+                enumListenerFix = true;
+            } else {
+                enumListenerFix = false;
+            }
+            //TODO Add the log
+        }, false);
+        appConfigListener = setListenerOn(AppConst.ConfigReferences.CONFIG_LOCATION, () -> {
+            MachineConfig.getInstance().saveConfig();
+            //TODO Add the log
+            System.out.println("Config changed");
+        }, true);
+    }
 
     public static SecurityService getInstance(){
         if(instance == null){
@@ -68,53 +104,13 @@ public class SecurityService extends CommanderService{
 
     @Override
     public void run() {
-        Thread usbStorListener = setListenerOn(AppConst.RegistryReferences.USB_STOR, () -> {
-            if(!expectedChange){
-                DriveManager.removeExternalDrives();
-                forceClose();
-                System.out.println("Stor changed");
-            } else {
-                expectedChange = false;
-            }
-            
-            //TODO Add the log
-            
-        });
-        
-        Thread usbEnumListener = setListenerOn(AppConst.RegistryReferences.USB_ENUM, () -> {
-            if(!enumListenerFix){
-                System.out.println("Enum changed");
-                enumListenerFix = true;
-            } else {
-                enumListenerFix = false;
-            }
-            
-            //TODO Add the log
+        startListener(appConfigListener);
+        startListener(usbEnumListener);
+        startListener(usbStorListener);
 
-        });
-        Thread appConfigListener = setListenerOn(AppConst.ConfigReferences.CONFIG_LOCATION, () -> {
-            MachineConfig.getInstance().saveConfig();
-            //TODO Add the log
-            System.out.println("Config changed");
-        });
-
-        try{
-            usbStorListener.setDaemon(true);
-            usbEnumListener.setDaemon(true);
-            appConfigListener.setDaemon(true);
-
-            usbStorListener.start();
-            usbEnumListener.start();
-            appConfigListener.start();
-
-            while(running);
-        }catch(Win32Exception err){
-            //TODO Add the log
-            running = false;
-        }
-        
-        
+        while(running);
     }
+
     /**
      * Returns a thread object with a function that will set an event listener waiting for changes to be made on the value of the entry defined by the parameter route, to then perform the function defined
      * @param route The route to the windows registry entry
@@ -122,44 +118,57 @@ public class SecurityService extends CommanderService{
      * @return A Thread object
      * @throws Win32Exception If the application can't access the registry values
      */
-    private Thread setListenerOn(String route, Runnable onChannge){
+    private Thread setListenerOn(String route, Runnable onChannge, boolean logErrors){
         return new Thread(()->{
-            boolean error = false;
             HKEYByReference keyHandler = new HKEYByReference();
             int op_status;
             int notify_status;
+            try{
+                op_status = Advapi32.INSTANCE.RegOpenKeyEx(
+                    AppConst.MAIN_LOCATION, 
+                    route, 
+                    0, 
+                    WinNT.KEY_NOTIFY, 
+                    keyHandler
+                );
 
-            op_status = Advapi32.INSTANCE.RegOpenKeyEx(
-                AppConst.MAIN_LOCATION, 
-                route, 
-                0, 
-                WinNT.KEY_NOTIFY, 
-                keyHandler
-            );
+            
+                if(op_status != WinError.ERROR_SUCCESS){
+                    throw new Win32Exception(op_status);
+                }
+            
+            
 
-            if(op_status != WinError.ERROR_SUCCESS){
-                throw new Win32Exception(op_status);
-            }
+                while(running){
+                        notify_status = Advapi32.INSTANCE.RegNotifyChangeKeyValue(
+                        keyHandler.getValue(), 
+                        false,
+                        WinNT.REG_NOTIFY_CHANGE_LAST_SET,
+                        null, 
+                        false);
 
-            while(!error && running){
-                try{
-                    notify_status = Advapi32.INSTANCE.RegNotifyChangeKeyValue(
-                    keyHandler.getValue(), 
-                    false,
-                    WinNT.REG_NOTIFY_CHANGE_LAST_SET,
-                    null, 
-                    false);
+                        if(notify_status == WinError.ERROR_SUCCESS){
+                            onChannge.run();
+                        }
+                }
 
-                    if(notify_status == WinError.ERROR_SUCCESS){
-                        onChannge.run();
-                    }
-                } catch(Win32Exception err){
-                    //TODO Add the log
-                    error = true;
+            }catch(Win32Exception err){
+                if(logErrors){
+                    StatusManager.statusLog(err.getMessage());
                 }
             }
+
             Advapi32.INSTANCE.RegCloseKey(keyHandler.getValue());
-            
         });
+    }
+
+    private boolean startListener(Thread listener){
+        try{
+            listener.setDaemon(true);
+            listener.start();
+            return true;
+        } catch(IllegalThreadStateException err){
+            return false;
+        }
     }
 }

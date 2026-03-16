@@ -19,4 +19,8 @@ public class AppConst {
         public static final String USB_STOR = "SYSTEM\\CurrentControlSet\\Services\\USBSTOR";
     }
 
+    public static class FileRoutes{
+        public static final String FOLDER_ROUTE = "C:\\Program Files\\UsbCommndr";
+        public static final String LOG_FOLDER_ROUTE = "C:\\Program Files\\UsbCommndr\\Unsended";
+    }
 }

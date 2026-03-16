@@ -43,7 +43,7 @@ public abstract class UsbRegistryManager{
                     );
 
                     if (success) {
-                        result.add(Map.of("DriveLetter", value, "Name", String.valueOf(volumeName), "Serial", String.valueOf(serialNumber)));
+                        result.add(Map.of("DriveLetter", value.trim(), "Name", String.valueOf(volumeName).trim()));
                     }
                 }
         }

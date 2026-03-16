@@ -18,7 +18,6 @@ public class ThreadService extends CommanderService{
     @Override
     public void run() {
         MachineConfig config = MachineConfig.getInstance();
-
         if(config.getUsbEnable()){
             UsbRegistryManager.enableAccess();
         } else {
@@ -28,6 +27,7 @@ public class ThreadService extends CommanderService{
 
         System.out.println(config.getUsbEnable() + "\n"+ config.getLogFrecuency() + "\n");
         SecurityService.getInstance().start();
+        LogService.getInstance().start();
         while (running);
     }
 }

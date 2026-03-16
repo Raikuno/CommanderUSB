@@ -29,4 +29,11 @@ public abstract class CommanderService extends Thread{
             super.start();
         }
     }
+
+    public void stopService(){
+        if(running){
+            this.running = false;
+            CommanderService.serviceList.remove(this);
+        }
+    }
 }
