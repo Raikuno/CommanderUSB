@@ -1,5 +1,7 @@
 package com.usbcommander.services;
 
+import java.util.function.Consumer;
+
 import com.sun.jna.platform.win32.Advapi32;
 import com.sun.jna.platform.win32.Win32Exception;
 import com.sun.jna.platform.win32.WinError;
@@ -7,9 +9,10 @@ import com.sun.jna.platform.win32.WinNT;
 import com.sun.jna.platform.win32.WinReg.HKEYByReference;
 import com.usbcommander.AppConst;
 import com.usbcommander.config.MachineConfig;
-import com.usbcommander.managers.DriveManager;
 import com.usbcommander.managers.StatusManager;
-import com.usbcommander.managers.UsbRegistryManager;
+import com.usbcommander.managers.UsbMemoryManager;
+import com.usbcommander.managers.contract.IStatusManager;
+import com.usbcommander.managers.contract.IUsbMemoryManager;
 import com.usbcommander.services.contract.CommanderService;
 
 public class SecurityService extends CommanderService{
@@ -26,18 +29,25 @@ public class SecurityService extends CommanderService{
 
     private Thread appConfigListener;
 
+    private IUsbMemoryManager usbMemoryManager;
+
+    private IStatusManager statusManager;
 
     private SecurityService(){
+        this.usbMemoryManager = UsbMemoryManager.getInstance();
+        this.statusManager = StatusManager.getInstance();
+
         usbStorListener = setListenerOn(AppConst.RegistryReferences.USB_STOR, () -> {
             if(!expectedChange){
-                DriveManager.removeExternalDrives();
+                statusManager.registryModificationLog();
+                usbMemoryManager.removeExternalDrives();
                 forceClose();
                 System.out.println("Stor changed");
             } else {
                 expectedChange = false;
             }
-            //TODO Add the log
-        }, true);
+            
+        }, null);
         
         usbEnumListener = setListenerOn(AppConst.RegistryReferences.USB_ENUM, () -> {
             if(!enumListenerFix){
@@ -47,12 +57,14 @@ public class SecurityService extends CommanderService{
                 enumListenerFix = false;
             }
             //TODO Add the log
-        }, false);
+        }, (err) -> {
+
+        });
         appConfigListener = setListenerOn(AppConst.ConfigReferences.CONFIG_LOCATION, () -> {
+            statusManager.unauthorizedConfigurationModificationLog();
             MachineConfig.getInstance().saveConfig();
-            //TODO Add the log
             System.out.println("Config changed");
-        }, true);
+        }, null);
     }
 
     public static SecurityService getInstance(){
@@ -72,7 +84,7 @@ public class SecurityService extends CommanderService{
             return false;
         }
         expectedChange = true;
-        boolean enabled = UsbRegistryManager.enableAccess();
+        boolean enabled = usbMemoryManager.enableAccess();
         if (!enabled){
             return enabled;
         }
@@ -81,11 +93,11 @@ public class SecurityService extends CommanderService{
             expectedChange = true; //Second change because it will be changed by the listener
         } catch (InterruptedException e) {
             // TODO Auto-generated catch block
-            UsbRegistryManager.disableAccess();
+            usbMemoryManager.disableAccess();
             return false;
         }
 
-        UsbRegistryManager.disableAccess();
+        usbMemoryManager.disableAccess();
         return true;
     }
 
@@ -98,7 +110,7 @@ public class SecurityService extends CommanderService{
             return false;
         }
         expectedChange = true;
-        boolean closed = UsbRegistryManager.disableAccess();
+        boolean closed = usbMemoryManager.disableAccess();
         return closed;
     }
 
@@ -115,10 +127,11 @@ public class SecurityService extends CommanderService{
      * Returns a thread object with a function that will set an event listener waiting for changes to be made on the value of the entry defined by the parameter route, to then perform the function defined
      * @param route The route to the windows registry entry
      * @param onChannge The function to be executed when the listener detect changes on the registry
+     * @param onCatch The function to be executed in case tan error is encountered when creating the lsitener
      * @return A Thread object
      * @throws Win32Exception If the application can't access the registry values
      */
-    private Thread setListenerOn(String route, Runnable onChannge, boolean logErrors){
+    private Thread setListenerOn(String route, Runnable onChannge, Consumer<Win32Exception> onCatch){
         return new Thread(()->{
             HKEYByReference keyHandler = new HKEYByReference();
             int op_status;
@@ -153,8 +166,8 @@ public class SecurityService extends CommanderService{
                 }
 
             }catch(Win32Exception err){
-                if(logErrors){
-                    StatusManager.statusLog(err.getMessage());
+                if(onCatch != null){
+                    onCatch.accept(err);
                 }
             }
 

@@ -1,12 +1,12 @@
 package com.usbcommander.services;
 
 import com.usbcommander.config.MachineConfig;
-import com.usbcommander.managers.DriveManager;
-import com.usbcommander.managers.UsbRegistryManager;
+import com.usbcommander.managers.UsbMemoryManager;
 import com.usbcommander.services.contract.CommanderService;
 
 public class ThreadService extends CommanderService{
     private static ThreadService instance;
+    private UsbMemoryManager usbMemoryManager;
 
     public static ThreadService getInstance(){
         if(instance == null){
@@ -15,14 +15,18 @@ public class ThreadService extends CommanderService{
         return instance;
     }
 
+    private ThreadService(){
+        this.usbMemoryManager = UsbMemoryManager.getInstance();
+    } 
+
     @Override
     public void run() {
         MachineConfig config = MachineConfig.getInstance();
         if(config.getUsbEnable()){
-            UsbRegistryManager.enableAccess();
+            usbMemoryManager.enableAccess();
         } else {
-            UsbRegistryManager.disableAccess();
-            DriveManager.removeExternalDrives();
+            usbMemoryManager.disableAccess();
+            usbMemoryManager.removeExternalDrives();
         }
 
         System.out.println(config.getUsbEnable() + "\n"+ config.getLogFrecuency() + "\n");

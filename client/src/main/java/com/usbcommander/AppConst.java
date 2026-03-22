@@ -23,4 +23,14 @@ public class AppConst {
         public static final String FOLDER_ROUTE = "C:\\Program Files\\UsbCommndr";
         public static final String LOG_FOLDER_ROUTE = "C:\\Program Files\\UsbCommndr\\Unsended";
     }
+
+    public static class EventLogReferences{
+        public static final String ENTRY_NAME = "UsbCmmndr";
+        public static final int INFO_CODE = 1001;
+        public static final int UNAUTHORIZED_CONFIGURATION_MODIFICATION = 1002;
+        public static final int REGISTRY_MODIFICATION = 1003;
+        public static final int INCOHERENT_VALUE = 1004;
+        public static final int MEMORY_CONNECTED = 1005;
+        public static final int ERROR_CODE = 1006;
+    }
 }

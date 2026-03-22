@@ -16,15 +16,15 @@ public class LogDTO{
 
     private LocalDateTime lastModificationDate;
 
-    private String description;
+    private int code;
 
     public LogDTO(int usbValue, boolean usbAllowed, List<Map<String, String>> usbList, LocalDateTime creationDate,
-            LocalDateTime lastModificationDate) {
+            int code) {
         this.usbValue = usbValue;
         this.usbAllowed = usbAllowed;
         this.usbList = usbList;
         this.creationDate = creationDate;
-        this.lastModificationDate = lastModificationDate;
+        this.code = code;
     }
 
     public int getUsbValue() {
@@ -47,8 +47,8 @@ public class LogDTO{
         return lastModificationDate;
     }
 
-    public String getDescription() {
-        return description;
+    public int getCode() {
+        return code;
     }
 
     public void setUsbValue(int usbValue) {
@@ -71,10 +71,7 @@ public class LogDTO{
         this.lastModificationDate = lastModificationDate;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setCode(int code) {
+        this.code = code;
     }
-
-    
-    
 }

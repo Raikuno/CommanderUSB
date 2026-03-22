@@ -4,12 +4,13 @@ import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.Win32Exception;
 import com.sun.jna.platform.win32.WinReg.HKEY;
 import com.usbcommander.AppConst;
+import com.usbcommander.config.contract.IMachineConfig;
 
 /**
  * Class with cerrtain values used in differents areas of the software.
  * Uses a singleton pattern to evade duplicated instances.
  */
-public class MachineConfig {
+public class MachineConfig implements IMachineConfig{
     private static HKEY mainLocation = AppConst.MAIN_LOCATION;
     private static String configLocation = AppConst.ConfigReferences.CONFIG_LOCATION;
     private static String usbAllowEntry = AppConst.ConfigReferences.USB_ALLOW_ENTRY;
@@ -58,10 +59,7 @@ public class MachineConfig {
         return instance;
     }
 
-
-    /**
-     * 
-     */
+    @Override
     public boolean saveConfig(){
         try{
             Advapi32Util.registrySetIntValue(mainLocation, configLocation, "allowUsb", usbEnable?1:0);
@@ -73,18 +71,22 @@ public class MachineConfig {
         
     }
 
+    @Override
     public boolean getUsbEnable(){
         return usbEnable;
     } 
 
+    @Override
     public long getLogFrecuency(){
         return logFrecuency;
     }
 
+    @Override
     public void setUsbEnable(boolean usbEnable){
         this.usbEnable = usbEnable;
     } 
 
+    @Override
     public void setLogFrecuency(long logFrecuency){
         if(logFrecuency < 300000){
             return;

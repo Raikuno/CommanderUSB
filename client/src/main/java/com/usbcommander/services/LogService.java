@@ -1,7 +1,6 @@
 package com.usbcommander.services;
 
 import com.usbcommander.config.MachineConfig;
-import com.usbcommander.managers.StatusManager;
 import com.usbcommander.services.contract.CommanderService;
 
 public class LogService extends CommanderService{
@@ -19,9 +18,9 @@ public class LogService extends CommanderService{
         while(running){
             try {
                 Thread.sleep(MachineConfig.getInstance().getLogFrecuency());
-                StatusManager.statusLog();
+                //StatusManager.statusLog();
             } catch (InterruptedException e) {
-                StatusManager.statusLog(e.getMessage());
+                //StatusManager.statusLog(e.getMessage());
                 running = false;
             }
         }
