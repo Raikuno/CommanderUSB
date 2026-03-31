@@ -98,14 +98,9 @@ public class UsbMemoryManager implements IUsbMemoryManager{
      * @return the value saved on the windows registry
      */
     @Override
-    public int getAccessValue(){
+    public int getAccessValue() throws Win32Exception{
         String keyValue = "Start";
-        try{
-            return Advapi32Util.registryGetIntValue(mainLocation, usbstor, keyValue);
-        }catch(Win32Exception err){
-            //TODO Add a way to save the error on a log
-            return -1;
-        }
+        return Advapi32Util.registryGetIntValue(mainLocation, usbstor, keyValue);
         
     }
 
@@ -114,15 +109,9 @@ public class UsbMemoryManager implements IUsbMemoryManager{
      * @return A boolean representing if the instruction was succesful
      */
     @Override
-    public boolean enableAccess(){
+    public void enableAccess() throws Win32Exception{
         String keyValue = "Start";
-        try{
-            Advapi32Util.registrySetIntValue(mainLocation, usbstor, keyValue, enable);
-            return getAccessValue() == enable;
-        }catch(Win32Exception err){
-            //TODO Add a way to save the error on a log
-            return false;
-        }
+        Advapi32Util.registrySetIntValue(mainLocation, usbstor, keyValue, enable);
 
     }
 
@@ -131,15 +120,9 @@ public class UsbMemoryManager implements IUsbMemoryManager{
      * @return A boolean representing if the instruction was succesful
      */
     @Override
-    public boolean disableAccess(){
+    public void disableAccess() throws Win32Exception{
         String keyValue = "Start";
-        try{
-            Advapi32Util.registrySetIntValue(mainLocation, usbstor, keyValue, disable);
-            return getAccessValue() == disable;
-        }catch(Win32Exception err){
-            //TODO Add a way to save the error on a log
-            return false;
-        }
+        Advapi32Util.registrySetIntValue(mainLocation, usbstor, keyValue, disable);
     }
 
     

@@ -1,7 +1,13 @@
 package com.usbcommander.services;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.sun.jna.platform.win32.Advapi32;
 import com.sun.jna.platform.win32.Win32Exception;
 import com.sun.jna.platform.win32.WinError;
@@ -9,6 +15,10 @@ import com.sun.jna.platform.win32.WinNT;
 import com.sun.jna.platform.win32.WinReg.HKEYByReference;
 import com.usbcommander.AppConst;
 import com.usbcommander.config.MachineConfig;
+import com.usbcommander.config.contract.IMachineConfig;
+import com.usbcommander.dto.LogDTO;
+import com.usbcommander.errors.NotConnectionException;
+import com.usbcommander.errors.ServiceDisabledException;
 import com.usbcommander.managers.StatusManager;
 import com.usbcommander.managers.UsbMemoryManager;
 import com.usbcommander.managers.contract.IStatusManager;
@@ -19,29 +29,30 @@ public class SecurityService extends CommanderService{
 
     private static SecurityService instance;
 
+    private final String SERVICE_ERROR_MESSAGE = AppConst.ErrorMessages.SERVICE_NOT_RUNNING;
+    private ObjectMapper mapper; 
     private boolean expectedChange = false;
-
-    private boolean enumListenerFix = false;
-
     private Thread usbStorListener;
-
-    private Thread usbEnumListener;
-
     private Thread appConfigListener;
-
     private IUsbMemoryManager usbMemoryManager;
-
     private IStatusManager statusManager;
+    private IMachineConfig machineConfig;
 
     private SecurityService(){
         this.usbMemoryManager = UsbMemoryManager.getInstance();
         this.statusManager = StatusManager.getInstance();
-
+        this.machineConfig = MachineConfig.getInstance();
+        mapper = new ObjectMapper().registerModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         usbStorListener = setListenerOn(AppConst.RegistryReferences.USB_STOR, () -> {
             if(!expectedChange){
-                statusManager.registryModificationLog();
+                Optional<LogDTO> log = statusManager.registryModificationLog();
                 usbMemoryManager.removeExternalDrives();
-                forceClose();
+                try{
+                    forceClose();
+                }catch(ServiceDisabledException err){
+                    statusManager.errorLog(err.getMessage());
+                }
+                log.ifPresent((l) -> sendLog(l));
                 System.out.println("Stor changed");
             } else {
                 expectedChange = false;
@@ -49,21 +60,16 @@ public class SecurityService extends CommanderService{
             
         }, null);
         
-        usbEnumListener = setListenerOn(AppConst.RegistryReferences.USB_ENUM, () -> {
-            if(!enumListenerFix){
-                System.out.println("Enum changed");
-                enumListenerFix = true;
-            } else {
-                enumListenerFix = false;
-            }
-            //TODO Add the log
-        }, (err) -> {
-
-        });
         appConfigListener = setListenerOn(AppConst.ConfigReferences.CONFIG_LOCATION, () -> {
-            statusManager.unauthorizedConfigurationModificationLog();
-            MachineConfig.getInstance().saveConfig();
-            System.out.println("Config changed");
+            if(!expectedChange){
+                expectedChange = true;
+                Optional<LogDTO> log = statusManager.unauthorizedConfigurationModificationLog();
+                machineConfig.saveConfig();
+                log.ifPresent((l) -> sendLog(l));
+                System.out.println("Config changed");
+            }else {
+                expectedChange = false;
+            }
         }, null);
     }
 
@@ -78,46 +84,45 @@ public class SecurityService extends CommanderService{
      * This method enables the use of usb storage units during the specified duration
      * @param time The time during the usb storage units will be able to be mounted
      * @return  A boolean representing if the action was succesfull or not. This will only be returned after the access has been closed
+     * @throws ServiceDisabledException 
      */
-    public boolean openAccess(long time){
+    public void openAccess(long time) throws ServiceDisabledException{
         if(!running){
-            return false;
+            throw new ServiceDisabledException(SERVICE_ERROR_MESSAGE);
         }
         expectedChange = true;
-        boolean enabled = usbMemoryManager.enableAccess();
-        if (!enabled){
-            return enabled;
-        }
+        machineConfig.setUsbEnable(true);
+        usbMemoryManager.enableAccess();
         try {
             Thread.sleep(time);
             expectedChange = true; //Second change because it will be changed by the listener
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
+            statusManager.errorLog(e.getMessage());
             usbMemoryManager.disableAccess();
-            return false;
         }
-
+        machineConfig.setUsbEnable(false);
+        usbMemoryManager.removeExternalDrives();
         usbMemoryManager.disableAccess();
-        return true;
     }
 
     /**
      * This method forces to close the access to usb storage units
      * @return A boolean representing if the operation was succesful
+     * @throws ServiceDisabledException 
      */
-    public boolean forceClose(){
+    public void forceClose() throws ServiceDisabledException{
         if(!running){
-            return false;
+            throw new ServiceDisabledException(SERVICE_ERROR_MESSAGE);
         }
         expectedChange = true;
-        boolean closed = usbMemoryManager.disableAccess();
-        return closed;
+        machineConfig.setUsbEnable(false);
+        usbMemoryManager.removeExternalDrives();
+        usbMemoryManager.disableAccess();
     }
 
     @Override
     public void run() {
         startListener(appConfigListener);
-        startListener(usbEnumListener);
         startListener(usbStorListener);
 
         while(running);
@@ -182,6 +187,20 @@ public class SecurityService extends CommanderService{
             return true;
         } catch(IllegalThreadStateException err){
             return false;
+        }
+    }
+
+    private void sendLog(LogDTO log){
+        List<LogDTO> logList = List.of(log);
+        try { 
+            String message = mapper.writeValueAsString(logList);
+            ServerConnectionService.getInstance().sendMessage(message);
+        } catch (ServiceDisabledException e) {
+            StatusManager.getInstance().errorLog(AppConst.ErrorMessages.SERVICE_NOT_RUNNING + e.getMessage());
+        } catch (NotConnectionException e) {
+            StatusManager.getInstance().errorLog(AppConst.ErrorMessages.CONNECTION_ERROR_MESSAGE + e.getMessage());
+        } catch (JsonProcessingException e) {
+            statusManager.errorLog(AppConst.ErrorMessages.JACKSON_ERROR_TEXT + e.getMessage());
         }
     }
 }

@@ -1,12 +1,15 @@
 package com.usbcommander.services;
 
 import com.usbcommander.config.MachineConfig;
+import com.usbcommander.config.contract.IMachineConfig;
 import com.usbcommander.managers.UsbMemoryManager;
+import com.usbcommander.managers.contract.IUsbMemoryManager;
 import com.usbcommander.services.contract.CommanderService;
 
 public class ThreadService extends CommanderService{
     private static ThreadService instance;
-    private UsbMemoryManager usbMemoryManager;
+    private IUsbMemoryManager usbMemoryManager;
+    private IMachineConfig machineConfig;
 
     public static ThreadService getInstance(){
         if(instance == null){
@@ -17,21 +20,22 @@ public class ThreadService extends CommanderService{
 
     private ThreadService(){
         this.usbMemoryManager = UsbMemoryManager.getInstance();
+        this.machineConfig = MachineConfig.getInstance();
+        machineConfig.enableServerService();
     } 
 
     @Override
     public void run() {
-        MachineConfig config = MachineConfig.getInstance();
-        if(config.getUsbEnable()){
+        if(machineConfig.getUsbEnable()){
             usbMemoryManager.enableAccess();
         } else {
             usbMemoryManager.disableAccess();
             usbMemoryManager.removeExternalDrives();
         }
-
-        System.out.println(config.getUsbEnable() + "\n"+ config.getLogFrecuency() + "\n");
+        System.out.println(machineConfig.getUsbEnable() + "\n"+ machineConfig.getLogFrecuency() + "\n");
         SecurityService.getInstance().start();
         LogService.getInstance().start();
+        ServerConnectionService.getInstance().start();
         while (running);
     }
 }

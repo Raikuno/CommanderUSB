@@ -3,6 +3,8 @@ package com.usbcommander.managers.contract;
 import java.util.List;
 import java.util.Map;
 
+import com.sun.jna.platform.win32.Win32Exception;
+
 public interface IUsbMemoryManager {
 
     /**
@@ -22,19 +24,19 @@ public interface IUsbMemoryManager {
      * This method checks and returns the value saved on the windows registry related to the use of usb storage units
      * @return the value saved on the windows registry
      */
-    public int getAccessValue();
+    public int getAccessValue() throws Win32Exception;
 
     /**
      * Change the registry value to allow the machine to read the usb storage units connected
      * @return A boolean representing if the instruction was succesful
      */
-    public boolean enableAccess();
+    public void enableAccess() throws Win32Exception;
 
     /**
      * Change the registry value to prevent the machine to read the usb storage units connected
      * @return A boolean representing if the instruction was succesful
      */
-    public boolean disableAccess();
+    public void disableAccess() throws Win32Exception;
 
-    public void removeExternalDrives();
+    public void removeExternalDrives() throws Win32Exception;
 }

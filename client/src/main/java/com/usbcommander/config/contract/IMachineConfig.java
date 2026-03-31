@@ -1,14 +1,21 @@
 package com.usbcommander.config.contract;
 
-public interface IMachineConfig {
+public abstract class IMachineConfig {
+    public static IMachineConfig instance;
     
-    public boolean saveConfig();
+    public abstract boolean saveConfig();
 
-    public boolean getUsbEnable();
+    public abstract boolean getUsbEnable();
 
-    public long getLogFrecuency();
+    public abstract long getLogFrecuency();
 
-    public void setUsbEnable(boolean usbEnable);
+    public abstract int getPort();
 
-    public void setLogFrecuency(long logFrecuency);
+    public abstract String getIp();
+
+    public abstract void setUsbEnable(boolean usbEnable);
+
+    public abstract void setLogFrecuency(long logFrecuency);
+
+    public abstract void enableServerService();
 }

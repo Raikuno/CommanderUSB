@@ -16,6 +16,8 @@ public class LogDTO{
 
     private LocalDateTime lastModificationDate;
 
+    private String errorMessage;
+
     private int code;
 
     public LogDTO(int usbValue, boolean usbAllowed, List<Map<String, String>> usbList, LocalDateTime creationDate,
@@ -25,6 +27,12 @@ public class LogDTO{
         this.usbList = usbList;
         this.creationDate = creationDate;
         this.code = code;
+    }
+
+    public LogDTO(int code, String errorMessage, LocalDateTime creationDate){
+        this.code = code;
+        this.errorMessage = errorMessage;
+        this.creationDate = creationDate;
     }
 
     public int getUsbValue() {
@@ -74,4 +82,14 @@ public class LogDTO{
     public void setCode(int code) {
         this.code = code;
     }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
+
+    
 }
