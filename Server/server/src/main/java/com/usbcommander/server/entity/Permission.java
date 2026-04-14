@@ -1,0 +1,56 @@
+package com.usbcommander.server.entity;
+
+import java.util.Set;
+import java.util.UUID;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name="permissions")
+public class Permission {
+    @Id
+    @GeneratedValue
+    @Column(columnDefinition="BINARY(16)", updatable=false)
+    private UUID id;
+
+    @Column(nullable=false, unique=true)
+    private String name;
+
+    @ManyToMany
+    @JoinTable(name="role_permissions",
+        joinColumns = @JoinColumn(name = "perm_id", columnDefinition="BINARY(16)"),
+        inverseJoinColumns = @JoinColumn(name = "role_id", columnDefinition="BINARY(16)")
+    )
+    private Set<Role> roles;
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
+}

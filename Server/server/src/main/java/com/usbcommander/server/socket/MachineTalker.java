@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.usbcommander.dto.LogDTO;
+import com.usbcommander.server.dto.LogDTO;
 import com.usbcommander.server.utils.CommanderLogger;
 import com.usbcommander.server.utils.WrapperMapper;
 
