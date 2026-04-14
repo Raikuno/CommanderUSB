@@ -1,1 +1,3 @@
-/client/target
+./Client/client/target
+./Client/installer/target
+./.vscode
