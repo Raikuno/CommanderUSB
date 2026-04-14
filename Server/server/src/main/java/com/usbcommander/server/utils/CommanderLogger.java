@@ -3,11 +3,11 @@ package com.usbcommander.server.utils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import jakarta.annotation.PostConstruct;
 
 @Component
 public class CommanderLogger {
@@ -16,12 +16,13 @@ public class CommanderLogger {
     private final String LOG_INIT_MSG = "ERROR WHILE INITIALIZING LOGGER. NO MESSAGE OR ERROR WILL BE LOGGED";
     private final String LOG_ERROR_MSG = "COULD NOT WRITE LOG: ";
 
+    @PostConstruct
     public void init(){
         File temp = new File(logRoute);
         if(temp.exists()){
+            System.out.println("\n\n\n\n\n\n\n" + logRoute + "\n\n\n\n\n\n\n\n"); 
             return;
         }
-        
         if(!temp.mkdirs()){
             System.err.println(LOG_INIT_MSG);
         }
@@ -29,9 +30,11 @@ public class CommanderLogger {
 
     public void writeLog(String message){
         try {
-            FileWriter logFile = new FileWriter(logRoute + LocalDateTime.now().format(DateTimeFormatter.ofPattern("nnssmmhhddMMyyyy")));
+            FileWriter logFile = new FileWriter(logRoute + "/" + System.currentTimeMillis() + ".log");
             logFile.write(message);
+            logFile.flush();
             logFile.close();
+            
         } catch (IOException e) {
             System.err.println(LOG_ERROR_MSG + e.getMessage());
         }
