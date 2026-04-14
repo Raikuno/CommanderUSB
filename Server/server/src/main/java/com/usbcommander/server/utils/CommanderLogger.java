@@ -20,7 +20,6 @@ public class CommanderLogger {
     public void init(){
         File temp = new File(logRoute);
         if(temp.exists()){
-            System.out.println("\n\n\n\n\n\n\n" + logRoute + "\n\n\n\n\n\n\n\n"); 
             return;
         }
         if(!temp.mkdirs()){
