@@ -9,8 +9,8 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.usbcommander.dto.ConfigDTO;
-import com.usbcommander.dto.LogDTO;
+import com.usbcommander.server.dto.ConfigDTO;
+import com.usbcommander.server.dto.LogDTO;
 
 @Component
 public class WrapperMapper {

@@ -1,4 +1,4 @@
-package com.usbcommander.dto;
+package com.usbcommander.server.dto;
 
 import java.time.LocalDateTime;
 import java.util.List;

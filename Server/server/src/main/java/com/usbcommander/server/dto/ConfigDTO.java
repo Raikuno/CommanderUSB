@@ -1,4 +1,4 @@
-package com.usbcommander.dto;
+package com.usbcommander.server.dto;
 
 public class ConfigDTO{
     private Boolean allow;
