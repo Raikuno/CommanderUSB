@@ -4,8 +4,11 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
@@ -13,18 +16,18 @@ import jakarta.persistence.Table;
 @Table(name="log")
 public class Log {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition="BIGINT", updatable=false)
-    private Integer id;
+    private Long id;
 
-    @ManyToOne(targetEntity=Machine.class)
-    @Column(nullable=false, name="machine_id")
+    @ManyToOne(targetEntity=Machine.class, fetch = FetchType.LAZY)
+    @JoinColumn(name = "machine_id", nullable = false)
     private Machine machine;
 
-    @Column(nullable=false, name="received_date")
+    @Column(nullable=false, name="receive_date")
     private LocalDateTime recievedDate;
 
-    @Column(nullable=false, name="usb_value")
+    @Column(nullable=false, name="usb_value", columnDefinition = "TINYINT")
     private Integer usbValue;
 
     @Column(nullable=false, columnDefinition="boolean", name="usb_allowed")
@@ -36,11 +39,14 @@ public class Log {
     @Column(name="expected_date", nullable=false)
     private LocalDateTime expectedDate;
 
-    public Integer getId() {
+    @Column(name = "needs_rev", nullable = false)
+    private Boolean needsRevission;
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
