@@ -3,9 +3,13 @@ package com.usbcommander.server.entity;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
@@ -13,7 +17,8 @@ import jakarta.persistence.Table;
 @Table(name="machine")
 public class Machine {
     @Id
-    @GeneratedValue
+    @JdbcTypeCode(SqlTypes.BINARY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition="BINARY(16)", updatable=false)
     private UUID id;
 
@@ -28,7 +33,7 @@ public class Machine {
     @Column(nullable=false, columnDefinition="boolean default true")
     private Boolean enable;
 
-    @Column(nullable=false, columnDefinition="unsigned int")
+    @Column(nullable=false, columnDefinition="unsigned int", name = "log_frec")
     private Integer logFrecuency;
 
     public UUID getId() {

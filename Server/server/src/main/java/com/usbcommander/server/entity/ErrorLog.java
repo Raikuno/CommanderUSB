@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -13,24 +14,23 @@ import jakarta.persistence.Table;
 @Table(name="error_log")
 public class ErrorLog {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition="BIGINT", updatable=false)
-    private Integer id;
+    private Long id;
 
     @ManyToOne(targetEntity=Machine.class)
-    @Column(nullable=false, name="machine_id")
     private Machine machine;
 
-    @Column(nullable=false, name="received_date")
+    @Column(nullable=false, name="receive_date")
     private LocalDateTime recievedDate;
 
     private String message;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
