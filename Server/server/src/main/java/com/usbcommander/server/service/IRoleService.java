@@ -10,4 +10,5 @@ public interface IRoleService {
     public List<Role> getAll();
     public Optional<Role> getByName(String name);
     public Optional<Role> getById(UUID uuid);
+    public void save(Role role);
 }

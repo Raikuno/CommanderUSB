@@ -11,9 +11,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name="log")
+@Table(name="log",
+    uniqueConstraints = @UniqueConstraint(columnNames = {"creation_date", "machine_id"})
+)
 public class Log {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,8 +39,8 @@ public class Log {
     @Column(nullable=false, name="log_code")
     private Integer logCode;
     
-    @Column(name="expected_date", nullable=false)
-    private LocalDateTime expectedDate;
+    @Column(name="creation_date", nullable=false)
+    private LocalDateTime creationDate;
 
     @Column(name = "needs_rev", nullable = false)
     private Boolean needsRevission;
@@ -90,12 +93,20 @@ public class Log {
         this.logCode = logCode;
     }
 
-    public LocalDateTime getExpectedDate() {
-        return expectedDate;
+    public LocalDateTime getCreationDate() {
+        return creationDate;
     }
 
-    public void setExpectedDate(LocalDateTime expectedDate) {
-        this.expectedDate = expectedDate;
+    public void setCreationDate(LocalDateTime creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    public Boolean getNeedsRevission() {
+        return needsRevission;
+    }
+
+    public void setNeedsRevission(Boolean needsRevission) {
+        this.needsRevission = needsRevission;
     }
 
     

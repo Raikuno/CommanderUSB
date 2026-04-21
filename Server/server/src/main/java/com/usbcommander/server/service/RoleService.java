@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import com.usbcommander.server.entity.Machine;
 import com.usbcommander.server.entity.Role;
 import com.usbcommander.server.repository.RoleRepository;
 
@@ -27,6 +28,11 @@ public class RoleService implements IRoleService{
     @Override
     public List<Role> getAll() {
         return repository.findAll();
+    }
+
+    @Override
+    public void save(Role role) {
+        repository.save(role);
     }
     
 }

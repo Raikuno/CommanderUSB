@@ -29,5 +29,10 @@ public class ErrorLogService implements IErrorLogService{
     public List<ErrorLog> getByRecievedDateBetween(LocalDateTime start, LocalDateTime end) {
         return repository.findByRecievedDateBetween(start, end);
     }
+
+    @Override
+    public void save(ErrorLog errorLog) {
+        repository.save(errorLog);
+    }
     
 }

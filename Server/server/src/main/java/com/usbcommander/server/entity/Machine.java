@@ -25,15 +25,18 @@ public class Machine {
     @Column(nullable=false, unique=true)
     private String name;
 
+    @Column(nullable = false, unique = true)
+    private String ip;
+
     @Column(nullable=false, unique=true, name="reg_dt")
     private LocalDateTime registeredDate;
 
     private String description;
 
-    @Column(nullable=false, columnDefinition="boolean default true")
-    private Boolean enable;
+    @Column(nullable=false, columnDefinition="boolean default false")
+    private Boolean disable;
 
-    @Column(nullable=false, columnDefinition="unsigned int", name = "log_frec")
+    @Column(nullable=false, columnDefinition="unsigned int default 300000", name = "log_frec")
     private Integer logFrecuency;
 
     public UUID getId() {
@@ -68,12 +71,12 @@ public class Machine {
         this.description = description;
     }
 
-    public Boolean getEnable() {
-        return enable;
+    public Boolean getDisable() {
+        return disable;
     }
 
-    public void setEnable(Boolean enable) {
-        this.enable = enable;
+    public void setDisable(Boolean disable) {
+        this.disable = disable;
     }
 
     public Integer getLogFrecuency() {
@@ -82,6 +85,14 @@ public class Machine {
 
     public void setLogFrecuency(Integer logFrecuency) {
         this.logFrecuency = logFrecuency;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
     }
 
     

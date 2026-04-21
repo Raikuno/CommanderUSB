@@ -30,5 +30,14 @@ public class LogService implements ILogService{
         return repository.findByRecievedDateBetweenAndMachine(start, end, machine);
     }
 
+    @Override
+    public List<Log> getByCreationDateAndMachine(LocalDateTime creationDate, Machine machine) {
+        return repository.findByCreationDateAndMachine(creationDate, machine);
+    }
+
+    @Override
+    public void save(Log log) {
+        repository.save(log);
+    }
     
 }

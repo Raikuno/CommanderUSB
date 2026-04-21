@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import com.usbcommander.server.utils.CommanderLogger;
@@ -22,6 +23,8 @@ public class SocketConnection {
     @Autowired
     private CommanderLogger logger;
     
+    @Autowired
+    private ApplicationContext context;
     private ServerSocket socket;
     private ExecutorService threadPool;
 
@@ -38,21 +41,18 @@ public class SocketConnection {
 
     public void startServer(){
         Thread process = new Thread(() -> {
-            boolean error = false;
-            while(!error){  //TODO Use a better condition
+            while(true){  //TODO Use a better condition
                 try {
-                Socket client = socket.accept();
-                threadPool.execute(() -> {
+                    Socket client = socket.accept();
                     Socket clientSocket = client;
-                    MachineTalker talker = new MachineTalker(clientSocket);
+                    MachineTalker talker = context.getBean(MachineTalker.class);
+                    talker.setSocker(clientSocket);
                     talker.register();
                     talker.startToListen();
-                });
                 } catch (IOException e) {
-                    logger.writeLog(e.getMessage());
-                    error = true;
+                        logger.writeLog(e.getMessage());
+                    }
                 }
-            }
         });
         process.setDaemon(true);
         process.start();

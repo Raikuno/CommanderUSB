@@ -1,9 +1,10 @@
 package com.usbcommander.server.service;
 
-import java.security.Permission;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import com.usbcommander.server.entity.Permission;
 
 public interface IPermissionService {
     public List<Permission> getAll();
