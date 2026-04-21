@@ -14,9 +14,11 @@ import java.time.LocalDateTime;
 public interface MachineRepository extends JpaRepository<Machine, UUID>{
     Optional<Machine> findById(UUID id);
 
-    List<Machine> findByName(String name);
+    Optional<Machine> findByName(String name);
+    Optional<Machine> findByIp(String ip);
 
-    List<Machine> findByEnable(Boolean enable);
+    List<Machine> findByDisable(Boolean disable);
 
     List<Machine> findByRegisteredDate(LocalDateTime registeredDate);
+
 }

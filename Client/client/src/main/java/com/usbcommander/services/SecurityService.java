@@ -52,7 +52,7 @@ public class SecurityService extends CommanderService{
                     try{
                         forceClose();
                     }catch(ServiceDisabledException err){
-                        statusManager.generateLog(LogType.ERROR, err.getMessage());
+                        LogDTO errorLog =statusManager.generateLog(LogType.ERROR, err.getMessage());
                     }
                     sendLog(log);
                     System.out.println("Stor changed");

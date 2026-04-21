@@ -1,6 +1,5 @@
 package com.usbcommander.server.service;
 
-import java.security.Permission;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -8,6 +7,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.usbcommander.server.entity.Permission;
 import com.usbcommander.server.repository.PermissionRepository;
 
 @Service

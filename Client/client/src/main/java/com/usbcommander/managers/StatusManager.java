@@ -50,7 +50,7 @@ public class StatusManager extends IStatusManager{
         LogDTO log;
         String logJson;
         int winType;
-        if(type == LogType.ERROR){
+        if(type == LogType.ERROR || type == LogType.CONNECTION){
             log = new LogDTO(type.getCode(), message, LocalDateTime.now());
         } else {
             try{

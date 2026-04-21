@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.usbcommander.server.entity.Role;
@@ -15,6 +16,8 @@ import com.usbcommander.server.repository.UserRepository;
 public class UserService implements IUserService{
     @Autowired
     private UserRepository repository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public Optional<User> getByName(String name) {
@@ -34,6 +37,12 @@ public class UserService implements IUserService{
     @Override
     public List<User> getAll() {
         return repository.findAll();
+    }
+
+    @Override
+    public void save(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        repository.save(user);
     }
     
 }

@@ -9,9 +9,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name="error_log")
+@Table(name="error_log",
+    uniqueConstraints = @UniqueConstraint(columnNames = {"creation_date", "machine_id"})
+)
 public class ErrorLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,6 +26,9 @@ public class ErrorLog {
 
     @Column(nullable=false, name="receive_date")
     private LocalDateTime recievedDate;
+
+    @Column(nullable=false, name="creation_date")
+    private LocalDateTime creationDate;
 
     private String message;
 
@@ -58,5 +64,11 @@ public class ErrorLog {
         this.message = message;
     }
 
-    
+    public LocalDateTime getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(LocalDateTime creationDate) {
+        this.creationDate = creationDate;
+    }
 }

@@ -4,32 +4,69 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.usbcommander.server.dto.LogDTO;
+import com.usbcommander.server.entity.ErrorLog;
+import com.usbcommander.server.entity.Log;
+import com.usbcommander.server.entity.Machine;
+import com.usbcommander.server.enums.LogType;
+import com.usbcommander.server.errors.MachineDisableException;
+import com.usbcommander.server.service.IErrorLogService;
+import com.usbcommander.server.service.ILogService;
+import com.usbcommander.server.service.IMachineService;
 import com.usbcommander.server.utils.CommanderLogger;
 import com.usbcommander.server.utils.WrapperMapper;
 
 @Component
 @Scope("prototype")
 public class MachineTalker {
+    @Autowired
+    private IMachineService machineService;
     private static Map<String, MachineTalker> machines = new HashMap<>();
     @Autowired
     private WrapperMapper mapper;
     @Autowired
     private CommanderLogger logger;
+    @Autowired
+    private ILogService logService;
+    @Autowired
+    private IErrorLogService errorLogService;
+    @Autowired
+    ApplicationContext context;
+
     private Socket socket;
+    private Machine machine;
 
-
-
-    public MachineTalker(Socket socket){
+    public void setSocker(Socket socket){
         this.socket = socket;
+    }
+    public void validateMachine(String ip) throws MachineDisableException{
+        Optional<Machine> savedMachine = machineService.getByIp(ip);
+        if(savedMachine.isPresent()){
+            if(savedMachine.get().getDisable()){
+                throw new MachineDisableException("This machine is disabled");
+            }
+           machine = savedMachine.get(); 
+           return;
+        } else {
+            Machine newMachine = new Machine();
+            newMachine.setName(ip);
+            newMachine.setIp(ip);
+            newMachine.setRegisteredDate(LocalDateTime.now());
+            machineService.save(newMachine);
+
+            machine = newMachine;
+        }
     }
 
     public void register(){
@@ -42,9 +79,8 @@ public class MachineTalker {
                 try {
                     DataInputStream input = new DataInputStream(socket.getInputStream());
                     String message = input.readUTF();
-                    logger.writeLog("Debug message " + message);
                     List<LogDTO> log = mapper.stringToLogDTOList(message);
-                    //TODO add a way to add the logs to the database
+                    log.forEach(t -> saveLog(t));
                 } catch (IOException e) {
                     logger.writeLog(e.getMessage());
                 }
@@ -70,5 +106,39 @@ public class MachineTalker {
         return machines.get(ip);
     }
 
+    private void saveLog(LogDTO log){
+        if(log.getCode() == LogType.ERROR.getCode() || log.getCode() == LogType.CONNECTION.getCode()){
+            ErrorLog errorLog = new ErrorLog();
+            errorLog.setMachine(machine);
+            errorLog.setMessage(log.getErrorMessage());
+            errorLog.setRecievedDate(LocalDateTime.now());
+            errorLog.setCreationDate(log.getCreationDate());
+            try{
+                errorLogService.save(errorLog);
+            }catch(Exception e){
+                logger.writeLog("Duplicate Entry: "+ e.getMessage());
+            }
+            
 
+        } else {
+
+            Log newLog = new Log();
+            newLog.setLogCode(log.getCode());
+            newLog.setMachine(machine);
+            newLog.setUsbAllowed(log.isUsbAllowed());
+            newLog.setRecievedDate(LocalDateTime.now());
+            newLog.setUsbValue(log.getUsbValue());
+            newLog.setCreationDate(log.getCreationDate());
+            if(log.getCode() == LogType.INFO.getCode()){
+                newLog.setNeedsRevission(false); 
+            } else {
+                newLog.setNeedsRevission(true); 
+            }
+            try{
+                logService.save(newLog);
+            }catch(Exception e){
+                logger.writeLog("Duplicate Entry: "+ e.getMessage());
+            }
+        }
+    }
 }

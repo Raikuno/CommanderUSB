@@ -12,4 +12,5 @@ public interface IUserService {
     public Optional<User> getByName(String name);
     public Optional<User> getById(UUID id);
     public List<User> getByRoleId(Role roleId);
+    public void save(User user);
 }

@@ -22,13 +22,13 @@ public class MachineService implements IMachineService{
     }
 
     @Override
-    public List<Machine> getByName(String name) {
+    public Optional<Machine> getByName(String name) {
         return repository.findByName(name);
     }
 
     @Override
-    public List<Machine> getByEnable(Boolean enable) {
-        return repository.findByEnable(enable);
+    public List<Machine> getByEnable(Boolean disable) {
+        return repository.findByDisable(disable);
     }
 
     @Override
@@ -39,6 +39,16 @@ public class MachineService implements IMachineService{
     @Override
     public List<Machine> getAll() {
         return repository.findAll();
+    }
+
+    @Override
+    public void save(Machine machine) {
+        repository.save(machine);
+    }
+
+    @Override
+    public Optional<Machine> getByIp(String ip) {
+        return repository.findByIp(ip);
     }
     
 }

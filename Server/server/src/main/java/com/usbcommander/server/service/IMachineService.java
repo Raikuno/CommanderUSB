@@ -12,9 +12,13 @@ public interface IMachineService {
     
     public Optional<Machine> getById(UUID id);
 
-    public List<Machine> getByName(String name);
+    public Optional<Machine> getByName(String name);
+
+    public Optional<Machine> getByIp(String ip);
 
     public List<Machine> getByEnable(Boolean enable);
 
     public List<Machine> getByRegisteredDate(LocalDateTime registeredDate);
+
+    public void save(Machine machine);
 }

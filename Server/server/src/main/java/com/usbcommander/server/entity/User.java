@@ -33,8 +33,8 @@ public class User {
     @Column(nullable=false)
     private String password;
 
-    @Column(nullable=false, columnDefinition="boolean default true")
-    private Boolean enabled;
+    @Column(nullable=false, columnDefinition="boolean default false")
+    private Boolean disable;
 
     @ManyToOne(targetEntity=Role.class)
     @JoinColumn(name = "role_id", nullable = true)
@@ -72,19 +72,19 @@ public class User {
         this.password = password;
     }
 
-    public Boolean getEnabled() {
-        return enabled;
+    public Boolean getDisable() {
+        return disable;
     }
 
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
+    public void setDisable(Boolean disable) {
+        this.disable = disable;
     }
 
-    public Role getRoleId() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRoleId(Role role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 

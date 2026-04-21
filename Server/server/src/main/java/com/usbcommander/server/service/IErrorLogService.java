@@ -10,4 +10,5 @@ public interface IErrorLogService {
     public List<ErrorLog> getByErrorLogsByMachine(Machine machine);
     public List<ErrorLog> getByRecievedDate(LocalDateTime recievedDate);
     public List<ErrorLog> getByRecievedDateBetween(LocalDateTime start, LocalDateTime end);
+    public void save(ErrorLog errorLog);
 }
