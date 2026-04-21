@@ -3,6 +3,7 @@ package com.usbcommander.managers;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,10 +43,32 @@ public class StatusManager extends IStatusManager{
         return instance;
     }
 
+    @Override
+    public LogDTO generateLog(){
+        Optional<LogType> type = Optional.empty();
+        if(machineConfig.isUsbEnable() && usbMemoryManager.getAccessValue()==AppConst.RegistryReferences.ENABLE_VALUE){
+            type = Optional.of(LogType.INCOHERENT);
+        }
+
+        if(usbMemoryManager.isDriveConnected()>0){
+            type = Optional.of(LogType.MEMORY_CONN);
+            usbMemoryManager.removeExternalDrives();
+        }
+
+        if(type.isEmpty()){
+            type = Optional.of(LogType.INFO);
+        }
+
+        return generateLog(type.get());
+    }
+
+
+    @Override
     public LogDTO generateLog(LogType type){
         return generateLog(type, "");
     }
 
+    @Override
     public LogDTO generateLog(LogType type, String message){
         LogDTO log;
         String logJson;

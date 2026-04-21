@@ -11,6 +11,8 @@ public abstract class IStatusManager {
 
     protected IStatusManager(){}
 
+    public abstract LogDTO generateLog();
+
     public abstract LogDTO generateLog(LogType type);
 
     public abstract LogDTO generateLog(LogType type, String message);
