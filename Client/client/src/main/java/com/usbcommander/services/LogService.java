@@ -44,7 +44,7 @@ public class LogService extends CommanderService{
         while(running){
             try {
                 Thread.sleep(machineConfig.getLogFrecuency());
-                statusManager.generateLog(LogType.INFO);
+                statusManager.generateLog();
                 List<LogDTO> history = statusManager.getHistory();
                 try { 
                     String message = mapper.writeValueAsString(history);
