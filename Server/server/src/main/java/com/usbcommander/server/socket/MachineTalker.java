@@ -47,14 +47,13 @@ public class MachineTalker {
     private Socket socket;
     private Machine machine;
 
-    public void setSocker(Socket socket){
+    public void setSocker(Socket socket) throws MachineDisableException{
         this.socket = socket;
-    }
-    public void validateMachine(String ip) throws MachineDisableException{
+        String ip = socket.getInetAddress().toString();
         Optional<Machine> savedMachine = machineService.getByIp(ip);
         if(savedMachine.isPresent()){
             if(savedMachine.get().getDisable()){
-                throw new MachineDisableException("This machine is disabled");
+                throw new MachineDisableException("The machine with IP "+ ip + " is disabled");
             }
            machine = savedMachine.get(); 
            return;
@@ -62,26 +61,26 @@ public class MachineTalker {
             Machine newMachine = new Machine();
             newMachine.setName(ip);
             newMachine.setIp(ip);
+            newMachine.setDisable(false);
+            newMachine.setLogFrecuency(300000);
             newMachine.setRegisteredDate(LocalDateTime.now());
             machineService.save(newMachine);
 
             machine = newMachine;
         }
-    }
-
-    public void register(){
-        machines.put(socket.getInetAddress().toString(), this);
+        machines.put(ip, this);
     }
 
     public void startToListen(){
         Thread listenerThread = new Thread(() -> {
-            while (true) {  //TODO Use a better condition
+            while (true) {  
                 try {
                     DataInputStream input = new DataInputStream(socket.getInputStream());
                     String message = input.readUTF();
                     List<LogDTO> log = mapper.stringToLogDTOList(message);
                     log.forEach(t -> saveLog(t));
                 } catch (IOException e) {
+                    machines.remove(socket.getInetAddress().toString());
                     logger.writeLog(e.getMessage());
                 }
             }

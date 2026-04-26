@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}" rel="stylesheet">
+    <link rel="stylesheet" href="@{/css/style.css}">
     <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
     <title>Welcome</title>
 </head>
@@ -12,11 +13,11 @@
         <div th:replace="fragments/navbar :: navbar"></div>
     </header>
     <main>
-        Welcome <span th:text="${#authentication.name}"></span>
+        <h1 class="mb-5 mt-5">Welcome back <span th:text="${#authentication.principal.user.name}"></span></h1>
+
+        <div th:replace="fragments/machine_list :: machineList"></div>
+
     </main>
-    <footer>
-        <p>To be made</p>
-    </footer>
     
 </body>
 </html>

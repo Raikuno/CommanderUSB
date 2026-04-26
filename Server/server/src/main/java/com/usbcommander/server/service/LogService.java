@@ -39,5 +39,10 @@ public class LogService implements ILogService{
     public void save(Log log) {
         repository.save(log);
     }
+
+    @Override
+    public List<Log> getAllUnrevised() {
+        return repository.findByNeedsRevission(true);
+    }
     
 }

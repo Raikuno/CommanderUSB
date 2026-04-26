@@ -4,15 +4,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.usbcommander.server.entity.Machine;
 import com.usbcommander.server.entity.Role;
 import com.usbcommander.server.repository.RoleRepository;
 
 @Service
 public class RoleService implements IRoleService{
 
+    @Autowired
     private RoleRepository repository;
 
     @Override

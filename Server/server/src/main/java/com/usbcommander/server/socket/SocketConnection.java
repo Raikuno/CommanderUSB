@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
+import com.usbcommander.server.errors.MachineDisableException;
 import com.usbcommander.server.utils.CommanderLogger;
 
 import jakarta.annotation.PostConstruct;
@@ -41,18 +42,17 @@ public class SocketConnection {
 
     public void startServer(){
         Thread process = new Thread(() -> {
-            while(true){  //TODO Use a better condition
+            while(true){
                 try {
                     Socket client = socket.accept();
                     Socket clientSocket = client;
                     MachineTalker talker = context.getBean(MachineTalker.class);
                     talker.setSocker(clientSocket);
-                    talker.register();
                     talker.startToListen();
-                } catch (IOException e) {
-                        logger.writeLog(e.getMessage());
-                    }
+                } catch (IOException | MachineDisableException e) {
+                    logger.writeLog(e.getMessage());
                 }
+            }
         });
         process.setDaemon(true);
         process.start();

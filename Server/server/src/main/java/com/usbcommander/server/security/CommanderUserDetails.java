@@ -1,4 +1,4 @@
-package com.usbcommander.security;
+package com.usbcommander.server.security;
 
 import java.util.Collection;
 import java.util.HashSet;

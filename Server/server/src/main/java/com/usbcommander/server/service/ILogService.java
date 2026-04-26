@@ -11,5 +11,6 @@ public interface ILogService {
     public List<Log> getByLogCode(Integer logCode);
     public List<Log> getByRecievedDateBetweenAndMachine(LocalDateTime start, LocalDateTime end, Machine machine);
     public List<Log> getByCreationDateAndMachine(LocalDateTime creationDate, Machine machine);
+    public List<Log> getAllUnrevised();
     public void save(Log log);
 }
