@@ -1,55 +1,96 @@
 package com.usbcommander.server;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.usbcommander.security.CommanderUserDetailsService;
+import com.usbcommander.server.security.JwtAuthenticationFilter;
+import com.usbcommander.server.service.IJwtService;
 
 @Configuration
 @PropertySource("classpath:usbcommander.properties")
 public class ServerConfig {
+
     @Bean
-    public PasswordEncoder bcrypt(){
-        return new BCryptPasswordEncoder();
+    PasswordEncoder bcrypt(){
+        return new BCryptPasswordEncoder(16);
+    }
+    
+    @Bean
+    JwtAuthenticationFilter jwtAuthenticationFilter(IJwtService jwtUtils, UserDetailsService userDetailsService) {
+        return new JwtAuthenticationFilter(jwtUtils, userDetailsService);
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
-        return new CommanderUserDetailsService();
-    }
-
-    @Bean
-    public DaoAuthenticationProvider authenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+    DaoAuthenticationProvider authenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder);
         return provider;
     }
-    
+
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, DaoAuthenticationProvider authProvider) throws Exception {
+    AuthenticationManager authenticationManager(DaoAuthenticationProvider provider) {
+        return new ProviderManager(provider);
+    }
+    
+    // API security chain
+    @Bean
+    SecurityFilterChain apiSecurityChain(HttpSecurity http, JwtAuthenticationFilter jwtFilter,
+            DaoAuthenticationProvider authProvider) throws Exception {
+        http.securityMatcher("/api/**");
         http.authenticationProvider(authProvider);
+
         http
-            .authorizeHttpRequests(auth -> 
-                auth
-                .requestMatchers("/login").permitAll()
-                .requestMatchers("/").authenticated()
+            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/auth/**").permitAll()
                 .anyRequest().authenticated()
             )
-            .formLogin(form -> form
-                .loginPage("/login")
-                .defaultSuccessUrl("/home", true)
-                .permitAll()
-            );
+            .exceptionHandling(ex -> ex.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
+    
+    // Web (browser) security chain
+    @Bean
+    SecurityFilterChain webSecurityChain(HttpSecurity http, DaoAuthenticationProvider authProvider, JwtAuthenticationFilter jwtFilter) throws Exception {
+        http.authenticationProvider(authProvider);
+
+        http
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/session/**").permitAll()
+                .requestMatchers("/css/**").permitAll()
+                .requestMatchers("/js/public/**").permitAll()
+                .requestMatchers("/webjars/**").permitAll()
+                .requestMatchers("/images/**").permitAll()
+                .requestMatchers("/favicon.ico").permitAll()
+                .requestMatchers("/").authenticated()
+                .anyRequest().authenticated()
+            )
+            .formLogin(form -> form
+                .loginPage("/session/login")
+                .defaultSuccessUrl("/", true)
+                .permitAll()
+            )
+            .exceptionHandling(ex -> ex.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/session/login")))
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
+     
 }

@@ -1,5 +1,6 @@
 package com.usbcommander.server.service;
 
+import java.lang.StackWalker.Option;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,6 +30,13 @@ public class UserService implements IUserService{
         return repository.findById(id);
     }
 
+    public Optional<User> getByIdSafe(String email) {
+        return repository.findByEmail(email).map(t -> {
+            t.setPassword("");
+            return t;
+        });
+    }
+
     @Override
     public List<User> getByRoleId(Role roleId) {
         return repository.findByRoleId(roleId);
@@ -36,13 +44,24 @@ public class UserService implements IUserService{
 
     @Override
     public List<User> getAll() {
-        return repository.findAll();
+        return repository.findAll().stream().peek(t -> t.setPassword("")).toList();
     }
 
     @Override
-    public void save(User user) {
+    public void update(User user) {
+        user.setPassword(repository.findById(user.getId()).get().getPassword());
+        repository.save(user);
+    }
+
+    @Override
+    public void create(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         repository.save(user);
+    }
+
+    @Override
+    public Optional<User> getByEmail(String email) {
+        return repository.findByEmail(email);
     }
     
 }

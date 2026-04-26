@@ -10,7 +10,9 @@ import com.usbcommander.server.entity.User;
 public interface IUserService {
     public List<User> getAll();
     public Optional<User> getByName(String name);
+    public Optional<User> getByEmail(String email);
     public Optional<User> getById(UUID id);
     public List<User> getByRoleId(Role roleId);
-    public void save(User user);
+    public void update(User user);
+    public void create(User user);
 }

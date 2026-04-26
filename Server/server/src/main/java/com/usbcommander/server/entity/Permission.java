@@ -28,11 +28,7 @@ public class Permission {
     @Column(nullable=false, unique=true)
     private String name;
 
-    @ManyToMany
-    @JoinTable(name="role_permissions",
-        joinColumns = @JoinColumn(name = "perm_id", columnDefinition="BINARY(16)"),
-        inverseJoinColumns = @JoinColumn(name = "role_id", columnDefinition="BINARY(16)")
-    )
+    @ManyToMany(mappedBy = "permissions")
     private Set<Role> roles;
 
     public UUID getId() {
