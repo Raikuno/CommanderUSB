@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+    <title>New User</title>
+</head>
+<body>
+<header>
+    <div th:replace="fragments/navbar :: navbar"></div>
+</header>
+<main class="container mt-4" style="max-width: 540px;">
+
+    <h2 class="mb-4">New User</h2>
+
+    <div id="alert-container"></div>
+
+    <form id="new-user-form" novalidate>
+        <div class="mb-3">
+            <label for="name" class="form-label">Username</label>
+            <input type="text" class="form-control" id="name" required>
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" required>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password" required>
+        </div>
+        <div class="mb-4">
+            <label for="role" class="form-label">Role <span class="text-muted">(optional)</span></label>
+            <select class="form-select" id="role">
+                <option value="">— No role —</option>
+            </select>
+        </div>
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary" id="submit-btn">Create User</button>
+            <a th:href="@{/users}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </form>
+
+</main>
+<script th:src="@{/js/private/users_new.js}"></script>
+</body>
+</html>

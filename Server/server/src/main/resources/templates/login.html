@@ -17,7 +17,6 @@
         <div class="card w-50 mt-5 ms-auto me-auto bg-body-secondary shadow-lg">
             <div class="card-body">
                 <form id="loginForm" th:action="@{/api/auth/login}" method="post" th:method="post">
-                    <input id="_csrf" type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>

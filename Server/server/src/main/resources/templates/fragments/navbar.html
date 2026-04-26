@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body>
 
 <nav th:fragment="navbar" class="navbar navbar-expand-sm navbar-light bg-primary shadow">
         <div class="container ">
-            <a class="navbar-brand app_title_font text-light ms-0" th:href="@{/}">USB Commander</a>
+            <a class="navbar-brand app_title_font text-light ms-0 me-5" th:href="@{/}">USB Commander</a>
             <button
                 class="navbar-toggler d-lg-none"
                 type="button"
@@ -18,8 +19,29 @@
             </button>
             <div class="collapse navbar-collapse " id="collapsibleNavId">
                 <ul class="navbar-nav me-auto mt-2 mt-lg-0 ">
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/accounts}">Accounts</a>
+                    <li class="nav-item dropdown" sec:authorize="hasAuthority('USER_MANAGEMENT') or hasAuthority('MANAGE_ROLES')">
+                        <a
+                        class="nav-link dropdown-toggle"
+                        href="#"
+                        id="dropdownId"
+                        data-bs-toggle="dropdown"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                        >Accounts</a>
+                        <div
+                            class="dropdown-menu"
+                            aria-labelledby="dropdownId"
+                        >
+                            <a class="dropdown-item" th:href="@{/users}" sec:authorize="hasAuthority('USER_MANAGEMENT')"
+                                >Users</a
+                            >
+                            <a class="dropdown-item" th:href="@{/users/roles}" sec:authorize="hasAuthority('MANAGE_ROLES')"
+                                >Roles</a
+                            >
+                            <a class="dropdown-item" th:href="@{/users/permissions}" sec:authorize="hasAuthority('MANAGE_ROLES')"
+                                >Permissions</a
+                            >
+                        </div>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" th:href="@{/machines}">Machines</a>
@@ -28,10 +50,30 @@
                         <a class="nav-link" th:href="@{/logs}">Logs</a>
                     </li>
                 </ul>
+                <div class="nav-item dropdown ms-auto">
+                    <button
+                        class="btn p-0 border-0"
+                        type="button"
+                        id="userMenuDropdown"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                    >
+                        <img th:src="@{/images/user.png}" alt="User" width="36" height="36"
+                             class="rounded-circle" style="object-fit: cover;">
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuDropdown">
+                        <li>
+                            <a class="dropdown-item" th:href="@{/account/change-password}">Change Password</a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item text-danger" th:href="@{/session/logout}">Logout</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </nav>
 
 </body>
 </html>
-

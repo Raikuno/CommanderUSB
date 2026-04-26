@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+    <title>Permissions</title>
+</head>
+<body>
+<header>
+    <div th:replace="fragments/navbar :: navbar"></div>
+</header>
+<main class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Permissions</h2>
+    </div>
+
+    <div class="mb-4">
+        <a th:href="@{/users}" class="btn btn-outline-secondary me-2">Users</a>
+        <a th:href="@{/users/roles}" class="btn btn-outline-secondary">Roles</a>
+    </div>
+
+    <p class="text-muted">Permissions are defined by the system and cannot be created or modified here.</p>
+
+    <div id="alert-container"></div>
+
+    <table class="table table-bordered table-hover align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>Permission Name</th>
+            </tr>
+        </thead>
+        <tbody id="permissions-tbody">
+            <tr><td class="text-center text-muted">Loading...</td></tr>
+        </tbody>
+    </table>
+
+</main>
+<script th:src="@{/js/private/permissions_index.js}"></script>
+</body>
+</html>

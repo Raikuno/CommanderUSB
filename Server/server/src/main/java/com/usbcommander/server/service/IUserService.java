@@ -12,7 +12,8 @@ public interface IUserService {
     public Optional<User> getByName(String name);
     public Optional<User> getByEmail(String email);
     public Optional<User> getById(UUID id);
-    public List<User> getByRoleId(Role roleId);
+    public List<User> getByRole(Role role);
     public void update(User user);
+    public void updatePassword(User user, String newPassword);
     public void create(User user);
 }
