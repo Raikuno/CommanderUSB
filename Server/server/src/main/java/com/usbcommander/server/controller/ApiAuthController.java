@@ -10,7 +10,6 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,6 +21,8 @@ import com.usbcommander.server.entity.User;
 import com.usbcommander.server.service.IFirstStartService;
 import com.usbcommander.server.service.JwtService;
 import com.usbcommander.server.service.UserService;
+import org.springframework.web.bind.annotation.GetMapping;
+
 
 @RestController
 @RequestMapping("/api/auth")
@@ -41,9 +42,21 @@ public class ApiAuthController {
         if (loginService.adminAccountCreated()) {
             return ResponseEntity.badRequest().body("Admin account already exists");
         }
-        var email = payload.get("email").trim();
-        var password = payload.get("password").trim();
-        var name = payload.get("name").trim();
+        var email = payload.getOrDefault("email", "").trim();
+        var password = payload.getOrDefault("password", "").trim();
+        var name = payload.getOrDefault("name", "").trim();
+
+        if(email.isBlank()){
+            return ResponseEntity.badRequest().body("Email is required");
+        }
+
+        if (password.isBlank() || password.length() < 8) {
+            return ResponseEntity.badRequest().body("Password is invalid");
+        }
+
+        if (name.isBlank()) {
+            return ResponseEntity.badRequest().body("Name is required");
+        }
 
         try {
             loginService.createAdminAccount(email, password, name);
@@ -60,19 +73,12 @@ public class ApiAuthController {
         try {
             authenticationManager
                     .authenticate(new UsernamePasswordAuthenticationToken(email, password));
-            // authentication successful
+
             Optional<User> op = userService.getByEmail(email);
             if (op.isEmpty()) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             User user = op.get();
             String accessToken = jwtUtils.generateAccessToken(user);
-            String refreshToken = jwtUtils.generateRefreshToken(user);
-            ResponseCookie refreshCookie = ResponseCookie.from(AppConst.REFRESH_TOKEN_NAME, refreshToken)
-                    .httpOnly(true)
-                    .path("/")
-                    .secure(true)
-                    .sameSite("Strict")
-                    .maxAge(jwtUtils.getRefreshTokenSeconds())
-                    .build();
+            //String refreshToken = jwtUtils.generateRefreshToken(user);
             ResponseCookie authCookie = ResponseCookie.from(AppConst.ACCESS_TOKEN_NAME, accessToken)
                     .httpOnly(true)
                     .path("/")
@@ -81,7 +87,6 @@ public class ApiAuthController {
                     .maxAge(jwtUtils.getAccessTokenSeconds())
                     .build();
             return ResponseEntity.ok()
-            .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
             .header(HttpHeaders.SET_COOKIE, authCookie.toString())
             .body(Map.of(
                     "access_token", accessToken,
@@ -91,23 +96,22 @@ public class ApiAuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
         }
     }
-    /*
-    @PostMapping("/refresh")
-    public ResponseEntity<?> refresh(@RequestBody Map<String, String> body) {
-        String refresh = body.getOrDefault(AppConst.REFRESH_TOKEN_NAME, "").trim();
-        if (!jwtUtils.validateToken(refresh) || !jwtUtils.isRefreshToken(refresh)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        String email = jwtUtils.getEmailFromToken(refresh);
-        if (email == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        Optional<User> op = userService.getByEmail(email);
-        if (op.isEmpty()) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        User user = op.get();
-        String accessToken = jwtUtils.generateAccessToken(user);
-        return ResponseEntity.ok(Map.of(
-                "access_token", accessToken,
+
+    @GetMapping
+    ("/logout")
+    public ResponseEntity<?> logout() {
+        ResponseCookie authCookie = ResponseCookie.from(AppConst.ACCESS_TOKEN_NAME, "")
+                .httpOnly(true)
+                .path("/")
+                .secure(true)
+                .sameSite("Strict")
+                .maxAge(0)
+                .build();
+        return ResponseEntity.ok()
+        .header(HttpHeaders.SET_COOKIE, authCookie.toString())
+        .body(Map.of(
+                "access_token", "",
                 "token_type", "bearer",
-                "expires_in", jwtUtils.getAccessTokenSeconds()));
+                "expires_in", 0));
     }
- */
 }

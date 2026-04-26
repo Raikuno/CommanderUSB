@@ -11,8 +11,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
@@ -28,6 +27,7 @@ public class Permission {
     @Column(nullable=false, unique=true)
     private String name;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "permissions")
     private Set<Role> roles;
 

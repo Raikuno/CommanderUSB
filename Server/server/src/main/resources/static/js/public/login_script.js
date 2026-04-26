@@ -32,8 +32,7 @@ form.addEventListener('submit', async function(e){
         const res = await fetch(form.getAttribute('action') || '/api/auth/login', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': csrfToken
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify(payload)
         });
