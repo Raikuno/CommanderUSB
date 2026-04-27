@@ -23,7 +23,7 @@ public class Log {
     @Column(columnDefinition="BIGINT", updatable=false)
     private Long id;
 
-    @ManyToOne(targetEntity=Machine.class, fetch = FetchType.LAZY)
+    @ManyToOne(targetEntity=Machine.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "machine_id", nullable = false)
     private Machine machine;
 

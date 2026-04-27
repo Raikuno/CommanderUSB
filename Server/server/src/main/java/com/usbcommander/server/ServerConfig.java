@@ -60,7 +60,14 @@ public class ServerConfig {
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("api/permissions").hasAuthority(AppConst.Authorities.MANAGE_ROLES)
+                .requestMatchers("api/roles").hasAuthority(AppConst.Authorities.MANAGE_ROLES)
+                .requestMatchers("api/roles/**").hasAuthority(AppConst.Authorities.MANAGE_ROLES)
                 .requestMatchers("/api/users").hasAuthority(AppConst.Authorities.USER_MANAGEMENT)
+                .requestMatchers("api/users/**").hasAuthority(AppConst.Authorities.USER_MANAGEMENT)
+                .requestMatchers("api/logs/**/revise").hasAuthority(AppConst.Authorities.SOLVE_LOGS)
+                .requestMatchers("api/logs/revise-bulk").hasAuthority(AppConst.Authorities.SOLVE_LOGS)
+                .requestMatchers("api/logs/**").hasAuthority(AppConst.Authorities.VIEW_LOGS)
                 .anyRequest().authenticated()
             )
             .exceptionHandling(ex -> ex.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
@@ -90,6 +97,7 @@ public class ServerConfig {
                 .requestMatchers("/users/roles/**").hasAuthority(AppConst.Authorities.MANAGE_ROLES)
                 .requestMatchers("/users/permissions").hasAuthority(AppConst.Authorities.MANAGE_ROLES)
                 .requestMatchers("/users/**").hasAuthority(AppConst.Authorities.USER_MANAGEMENT)
+                .requestMatchers("/log/**").hasAuthority(AppConst.Authorities.VIEW_LOGS)
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form

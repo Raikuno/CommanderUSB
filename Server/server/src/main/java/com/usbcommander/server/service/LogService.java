@@ -2,6 +2,7 @@ package com.usbcommander.server.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,18 @@ public class LogService implements ILogService{
     }
 
     @Override
+    public Optional<Log> getById(Long id) {
+        return repository.findById(id);
+    }
+
+    @Override
+    public void reviseAll(List<Long> ids) {
+        List<Log> logs = repository.findAllById(ids);
+        logs.forEach(log -> log.setNeedsRevission(false));
+        repository.saveAll(logs);
+    }
+
+    @Override
     public void save(Log log) {
         repository.save(log);
     }
@@ -44,5 +57,5 @@ public class LogService implements ILogService{
     public List<Log> getAllUnrevised() {
         return repository.findByNeedsRevission(true);
     }
-    
+
 }

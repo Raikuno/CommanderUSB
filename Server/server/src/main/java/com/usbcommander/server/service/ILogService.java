@@ -2,6 +2,7 @@ package com.usbcommander.server.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import com.usbcommander.server.entity.Log;
 import com.usbcommander.server.entity.Machine;
@@ -12,5 +13,7 @@ public interface ILogService {
     public List<Log> getByRecievedDateBetweenAndMachine(LocalDateTime start, LocalDateTime end, Machine machine);
     public List<Log> getByCreationDateAndMachine(LocalDateTime creationDate, Machine machine);
     public List<Log> getAllUnrevised();
+    public Optional<Log> getById(Long id);
+    public void reviseAll(List<Long> ids);
     public void save(Log log);
 }
