@@ -5,7 +5,7 @@ const LOG_TYPES = {
     1004: { label: 'Incoherent State',        cssClass: 'log-warning'  },
     1005: { label: 'Memory Connection Issue', cssClass: 'log-warning'  },
     1006: { label: 'Connection Issue',        cssClass: 'log-warning'  },
-    1007: { label: 'Critical Error',          cssClass: 'log-critical' }
+    1007: { label: 'Application Error',       cssClass: 'log-critical' }
 };
 
 function showAlert(msg, type) {
@@ -79,12 +79,10 @@ function loadLogs() {
         .catch(() => showAlert('Failed to load logs.', 'danger'));
 }
 
-// Select-all checkbox
 document.getElementById('select-all').addEventListener('change', function () {
     document.querySelectorAll('.log-checkbox').forEach(cb => cb.checked = this.checked);
 });
 
-// Mark as Revised button → open modal
 document.getElementById('mark-revised-btn').addEventListener('click', function () {
     const selected = [...document.querySelectorAll('.log-checkbox:checked')];
     if (selected.length === 0) {
@@ -95,7 +93,6 @@ document.getElementById('mark-revised-btn').addEventListener('click', function (
     new bootstrap.Modal(document.getElementById('reviseModal')).show();
 });
 
-// Confirm revision
 document.getElementById('confirm-revise-btn').addEventListener('click', function () {
     const btn = this;
     btn.disabled = true;
