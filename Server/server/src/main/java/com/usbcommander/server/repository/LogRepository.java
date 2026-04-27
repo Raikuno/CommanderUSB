@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 
 @Repository
-public interface LogRepository extends JpaRepository<Log, Integer>{
+public interface LogRepository extends JpaRepository<Log, Long>{
     List<Log> findByMachine(Machine machine);
     List<Log> findByLogCode(Integer logCode);
     List<Log> findByRecievedDateBetweenAndMachine(LocalDateTime start, LocalDateTime end, Machine machine);
