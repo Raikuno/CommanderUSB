@@ -26,12 +26,10 @@ public class ThreadService extends CommanderService{
 
     @Override
     public void run() {
-        if(machineConfig.isUsbEnable()){
-            usbMemoryManager.enableAccess();
-        } else {
-            usbMemoryManager.disableAccess();
-            usbMemoryManager.removeExternalDrives();
-        }
+        machineConfig.setUsbEnable(false);
+        machineConfig.saveConfig();
+        usbMemoryManager.disableAccess();
+        usbMemoryManager.removeExternalDrives();
         SecurityService.getInstance().start();
         LogService.getInstance().start();
         ServerConnectionService.getInstance().start();

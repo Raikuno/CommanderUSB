@@ -58,4 +58,9 @@ public class LogService implements ILogService{
         return repository.findByNeedsRevission(true);
     }
 
+    @Override
+    public List<Log> getByMachineAndNeedsRevission(Machine machine, Boolean needsRevission) {
+        return repository.findByMachineAndNeedsRevission(machine, needsRevission);
+    }
+
 }

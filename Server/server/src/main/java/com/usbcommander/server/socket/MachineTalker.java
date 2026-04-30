@@ -53,10 +53,14 @@ public class MachineTalker {
         Optional<Machine> savedMachine = machineService.getByIp(ip);
         if(savedMachine.isPresent()){
             if(savedMachine.get().getDisable()){
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    logger.writeLog("Error closing socket for disabled machine: "+ e.getMessage());
+                }
                 throw new MachineDisableException("The machine with IP "+ ip + " is disabled");
             }
            machine = savedMachine.get(); 
-           return;
         } else {
             Machine newMachine = new Machine();
             newMachine.setName(ip);
@@ -73,15 +77,19 @@ public class MachineTalker {
 
     public void startToListen(){
         Thread listenerThread = new Thread(() -> {
-            while (true) {  
+            while (!socket.isClosed()) {  
                 try {
                     DataInputStream input = new DataInputStream(socket.getInputStream());
                     String message = input.readUTF();
                     List<LogDTO> log = mapper.stringToLogDTOList(message);
                     log.forEach(t -> saveLog(t));
                 } catch (IOException e) {
+                    try {
+                        socket.close();
+                    } catch (IOException ioException) {
+                        logger.writeLog("Error closing socket of machine: " + ioException.getMessage());
+                    }
                     machines.remove(socket.getInetAddress().toString());
-                    logger.writeLog(e.getMessage());
                 }
             }
         });
@@ -103,6 +111,10 @@ public class MachineTalker {
 
     public static MachineTalker getMachineTalker(String ip){
         return machines.get(ip);
+    }
+
+    public static Map<String, MachineTalker> getMachines() {
+        return machines;
     }
 
     private void saveLog(LogDTO log){

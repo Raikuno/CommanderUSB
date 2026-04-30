@@ -1,4 +1,2 @@
-./Client/client/target
-./Client/installer/target
-./Server/server/target
-./.vscode
+**/.vscode
+**/target

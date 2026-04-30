@@ -13,6 +13,7 @@ public interface ILogService {
     public List<Log> getByRecievedDateBetweenAndMachine(LocalDateTime start, LocalDateTime end, Machine machine);
     public List<Log> getByCreationDateAndMachine(LocalDateTime creationDate, Machine machine);
     public List<Log> getAllUnrevised();
+    public List<Log> getByMachineAndNeedsRevission(Machine machine, Boolean needsRevission);
     public Optional<Log> getById(Long id);
     public void reviseAll(List<Long> ids);
     public void save(Log log);

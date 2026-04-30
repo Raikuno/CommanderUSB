@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+    <title>Machine Detail</title>
+</head>
+<body>
+<header>
+    <div th:replace="fragments/navbar :: navbar"></div>
+</header>
+<main class="container-fluid mt-4 px-4" style="max-width: 1400px;">
+
+    <div class="mb-3 d-flex justify-content-between align-items-center">
+        <a th:href="@{/machines}" class="btn btn-outline-secondary btn-sm">&larr; Back to Machines</a>
+        <button type="button" class="btn btn-warning btn-sm" id="toggle-disable-btn">Disable</button>
+    </div>
+
+    <div id="alert-container" class="mb-3"></div>
+
+    <div id="machine-header" class="mb-4">
+        <div id="machine-name-view" class="d-flex align-items-center mb-1">
+            <h2 id="machine-name" class="mb-0 me-2">—</h2>
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="edit-name-btn" title="Edit name">&#9998;</button>
+        </div>
+        <div id="machine-name-edit" class="d-none mb-2">
+            <div class="input-group" style="max-width: 480px;">
+                <input type="text" id="edit-name-input" class="form-control">
+                <button class="btn btn-success" type="button" id="save-name-btn">Save</button>
+                <button class="btn btn-secondary" type="button" id="cancel-name-btn">Cancel</button>
+            </div>
+        </div>
+        <h5 id="machine-ip" class="text-muted">—</h5>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-5">
+            <div id="machine-icon-box" class="ratio ratio-1x1 rounded mb-3 machine-icon-box">
+                <img th:src="@{/images/computer_icon.png}" alt="Computer" class="p-4 object-fit-contain">
+            </div>
+
+            <table class="table table-sm table-borderless">
+                <colgroup>
+                    <col style="width: 40%">
+                    <col style="width: 60%">
+                </colgroup>
+                <tbody>
+                    <tr>
+                        <td><strong>Log Frecuency</strong></td>
+                        <td id="info-log-frecuency">—</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Registration Date</strong></td>
+                        <td id="info-reg-dt">—</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Description</strong></td>
+                        <td>
+                            <div id="machine-description-view" class="d-flex align-items-start">
+                                <span id="info-description" class="me-2 flex-grow-1">—</span>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" id="edit-description-btn" title="Edit description">&#9998;</button>
+                            </div>
+                            <div id="machine-description-edit" class="d-none mt-1">
+                                <textarea id="edit-description-input" class="form-control mb-2" rows="3"></textarea>
+                                <button class="btn btn-sm btn-success" type="button" id="save-description-btn">Save</button>
+                                <button class="btn btn-sm btn-secondary" type="button" id="cancel-description-btn">Cancel</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="col-md-7">
+            <form id="config-form" class="card card-body mb-4">
+                <h5 class="card-title mb-3">Machine Configuration</h5>
+                <div class="row mb-2 align-items-center">
+                    <label for="cfg-log-frec" class="col-sm-5 col-form-label">Log Frecuency</label>
+                    <div class="col-sm-7">
+                        <input type="number" id="cfg-log-frec" class="form-control" min="0">
+                    </div>
+                </div>
+                <div class="row mb-2 align-items-center">
+                    <label for="cfg-enable-usb" class="col-sm-5 col-form-label">Enable Usb Access</label>
+                    <div class="col-sm-7">
+                        <div class="form-check">
+                            <input type="checkbox" id="cfg-enable-usb" class="form-check-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3 align-items-center">
+                    <label for="cfg-enable-for" class="col-sm-5 col-form-label">Enable for:</label>
+                    <div class="col-sm-7">
+                        <input type="number" id="cfg-enable-for" class="form-control" min="0">
+                    </div>
+                </div>
+                <div class="text-end">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+
+            <ul class="nav nav-tabs" id="logs-tabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="tab-logs-btn" data-bs-toggle="tab"
+                            data-bs-target="#tab-logs" type="button" role="tab">Logs</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="tab-error-logs-btn" data-bs-toggle="tab"
+                            data-bs-target="#tab-error-logs" type="button" role="tab">Error Logs</button>
+                </li>
+            </ul>
+
+            <div class="tab-content border border-top-0 rounded-bottom">
+                <div class="tab-pane fade show active machine-logs-pane" id="tab-logs" role="tabpanel">
+                    <table class="table table-borderless mb-0">
+                        <thead class="table-dark" style="position: sticky; top: 0; z-index: 1;">
+                            <tr>
+                                <th>Machine</th>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="logs-tbody">
+                            <tr><td colspan="4" class="text-center text-muted py-3">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="tab-pane fade machine-logs-pane" id="tab-error-logs" role="tabpanel">
+                    <table class="table table-borderless mb-0">
+                        <colgroup>
+                            <col style="width: 22%">
+                            <col style="width: 22%">
+                            <col style="width: 56%">
+                        </colgroup>
+                        <thead class="table-dark" style="position: sticky; top: 0; z-index: 1;">
+                            <tr>
+                                <th>Receive Date</th>
+                                <th>Creation Date</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody id="error-logs-tbody">
+                            <tr><td colspan="3" class="text-center text-muted py-3">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<script th:inline="javascript">window.MACHINE_ID = /*[[${machineId}]]*/ '';</script>
+<script th:src="@{/js/private/machines_detail.js}"></script>
+</body>
+</html>

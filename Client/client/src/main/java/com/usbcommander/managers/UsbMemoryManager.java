@@ -139,7 +139,11 @@ public class UsbMemoryManager extends IUsbMemoryManager{
             return v.get("DriveLetter");
         })
         .forEach((v) -> {
-            removeDrive(v);
+            try {
+                removeDrive(v);
+            } catch (Win32Exception e) {
+                System.err.println("Failed to eject drive " + v + ": " + e.getMessage());
+            }
         });
     }
 

@@ -12,18 +12,32 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 import com.usbcommander.server.entity.Log;
+import com.usbcommander.server.entity.Machine;
 import com.usbcommander.server.service.ILogService;
+import com.usbcommander.server.service.IMachineService;
 
 @RestController
 @RequestMapping("/api/logs")
 public class LogApiController {
 
     @Autowired private ILogService logService;
+    @Autowired private IMachineService machineService;
 
     @GetMapping("/unrevised")
     public ResponseEntity<List<Log>> getUnrevised() {
         return ResponseEntity.ok(logService.getAllUnrevised());
+    }
+
+    @GetMapping("/by-machine/{machineId}")
+    public ResponseEntity<List<Log>> getByMachine(@PathVariable UUID machineId) {
+        java.util.Optional<Machine> machine = machineService.getById(machineId);
+        if (machine.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(logService.getByMachine(machine.get()));
     }
 
     @GetMapping("/{id}")

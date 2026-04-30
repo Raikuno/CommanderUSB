@@ -37,6 +37,7 @@ public class LogService extends CommanderService{
 
     public void changeLogFrecuency(long frecuency){
         machineConfig.setLogFrecuency(frecuency);
+        machineConfig.saveConfig();
     }
 
     @Override

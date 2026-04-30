@@ -15,11 +15,11 @@ public class Main {
         String uninstallAbr = "-u";
         String ipRegex = "(\\b25[0-5]|\\b2[0-4][0-9]|\\b[01]?[0-9][0-9]?)(\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}";
         String portRegex = "[0-9]{0,4}";
-        boolean uninstall = false;
+        Optional<Boolean> uninstall = Optional.empty();
 
         for (String e : args) {
             if(e.startsWith(uninstallAbr) || e.startsWith(uninstallParam)){
-                uninstall = true;
+                uninstall = Optional.of(true);
                 break;
             }
 
@@ -40,20 +40,26 @@ public class Main {
 
         }
 
-        if(uninstall){
-            installer.uninstallService();
-            installer.registryDeletion();
-            installer.logRegistryDeletion();
-            if(installer.deleteFile()){
-                System.out.println("File deleted successfully.");
-            } else {
-                System.err.println("File could not be deleted.");
-                return;
-            }
-            return;
-        }
+        
+
         try (Scanner key = new Scanner(System.in)) {
-            if (ip.isEmpty()) {
+
+            if(installer.isInstalled() && uninstall.isEmpty()){
+            System.out.println("An installation or patial installation was found. Do you want to remove it?(Y/N)");
+                var answer = key.next().toLowerCase().trim().charAt(0);
+                if(answer == 'y'){
+                    uninstall = Optional.of(true);
+                } else {
+                    System.err.println("Cant install when an installation or partial installation is present");
+                    return;
+                }
+            } else if(uninstall.isEmpty()){
+                uninstall = Optional.of(false);
+            }
+
+            
+
+            if (ip.isEmpty() && !uninstall.get()) {
                 System.out.println("Insert valid ip:");
                 var temp = key.next();
                 if (temp.isEmpty() || !temp.matches(ipRegex)) {
@@ -62,7 +68,7 @@ public class Main {
                 ip = Optional.of(temp);
             }
 
-            if (port.isEmpty()) {
+            if (port.isEmpty() && !uninstall.get()) {
                 System.out.println("Insert valid port:");
                 var tempPort = key.next();
                 if (!tempPort.matches(portRegex)) {
@@ -70,18 +76,27 @@ public class Main {
                 }
                 port = Optional.of(Integer.valueOf(tempPort));
             }
+        
+
+            if(uninstall.get()){
+                    installer.stopScheduledTask();
+                    installer.registryDeletion();
+                    installer.logRegistryDeletion();
+                    installer.deleteApplication();
+                    return;
+                }
+
+            if (!installer.copyFile()) {
+                System.err.println("Application files couldnt be copied.");
+                return;
+            }
+
+            installer.registryCreation(ip.get(), port.get());
+            installer.logRegistryCreation();
+            installer.installScheduledTask();
         } catch (NumberFormatException e1) {
             System.err.println(e1.getMessage());
             return;
         }
-
-        if (!installer.copyFile()) {
-            System.err.println("Application not found or could not be copied to folder.");
-            return;
-        }
-
-        installer.registryCreation(ip.get(), port.get());
-        installer.logRegistryCreation();
-        installer.installService();
     }
 }

@@ -113,7 +113,9 @@ public class ServerConnectionService extends CommanderService{
                 connected = false;
             } catch (ServiceDisabledException e) {
                 statusManager.generateLog(LogType.ERROR,e.getMessage());
-            } 
+            } catch (RuntimeException e) {
+                statusManager.generateLog(LogType.ERROR, "Failed to apply config: " + e.getMessage());
+            }
             
         });
     }
