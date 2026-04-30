@@ -16,4 +16,5 @@ public interface LogRepository extends JpaRepository<Log, Long>{
     List<Log> findByRecievedDateBetweenAndMachine(LocalDateTime start, LocalDateTime end, Machine machine);
     List<Log> findByCreationDateAndMachine(LocalDateTime creationDate, Machine machine);
     List<Log> findByNeedsRevission(Boolean needsRevission);
+    List<Log> findByMachineAndNeedsRevission(Machine machine, Boolean needsRevission);
 }

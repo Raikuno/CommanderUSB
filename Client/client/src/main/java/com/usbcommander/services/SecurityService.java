@@ -36,6 +36,8 @@ public class SecurityService extends CommanderService{
     private IUsbMemoryManager usbMemoryManager;
     private IStatusManager statusManager;
     private IMachineConfig machineConfig;
+    private long grantedFor;
+    private Thread grantedAccess;
 
     private SecurityService(){
         this.usbMemoryManager = UsbMemoryManager.getInstance();
@@ -46,7 +48,6 @@ public class SecurityService extends CommanderService{
 
         usbStorListener = setListenerOn(AppConst.RegistryReferences.USB_STOR, () -> {
             if(!machineConfig.isUsbEnable()){
-                if(!expectedChange){
                     LogDTO log = statusManager.generateLog(LogType.REGISTRY_MOD);
                     usbMemoryManager.removeExternalDrives();
                     try{
@@ -56,9 +57,6 @@ public class SecurityService extends CommanderService{
                     }
                     sendLog(log);
                     System.out.println("Stor changed");
-                } else {
-                    expectedChange = false;
-                }
             }
         }, null);
         
@@ -92,32 +90,71 @@ public class SecurityService extends CommanderService{
         if(!running){
             throw new ServiceDisabledException(AppConst.ErrorMessages.SERVICE_NOT_RUNNING);
         }
-        machineConfig.setUsbEnable(true);
-        usbMemoryManager.enableAccess();
-        try {
-            Thread.sleep(time);
-        } catch (InterruptedException e) {
-            statusManager.generateLog(LogType.ERROR, e.getMessage());
-            usbMemoryManager.disableAccess();
+        if (grantedAccess != null && grantedAccess.isAlive()) {
+            grantedAccess.interrupt();
         }
-        machineConfig.setUsbEnable(false);
-        usbMemoryManager.removeExternalDrives();
-        usbMemoryManager.disableAccess();
+        grantedAccess = new Thread(() -> {
+            try {
+                machineConfig.setUsbEnable(true);
+                machineConfig.saveConfig();
+                usbMemoryManager.enableAccess();
+                try {
+                    Thread.sleep(grantedFor);
+                } catch (InterruptedException e) {
+                    statusManager.generateLog(LogType.ERROR, "Open access thread interrupted: " + e.getMessage());
+                }
+            } catch (Win32Exception e) {
+                statusManager.generateLog(LogType.ERROR, "Failed to enable USB access: " + e.getMessage());
+            } finally {
+                machineConfig.setUsbEnable(false);
+                try {
+                    usbMemoryManager.removeExternalDrives();
+                } catch (Win32Exception e) {
+                    statusManager.generateLog(LogType.ERROR, "Couldnt eject drives after closing access: " + e.getMessage());
+                }
+                try {
+                    usbMemoryManager.disableAccess();
+                } catch (Win32Exception e) {
+                    statusManager.generateLog(LogType.ERROR, "Couldnt disable USB access: " + e.getMessage());
+                }
+            }
+        });
+        grantedFor = time;
+        grantedAccess.setDaemon(true);
+        grantedAccess.start();
+
+        
     }
 
     /**
      * This method forces to close the access to usb storage units
      * @return A boolean representing if the operation was succesful
      * @throws ServiceDisabledException 
+                } else {
+                    expectedChange = false;
+                }
      */
     public void forceClose() throws ServiceDisabledException{
         if(!running){
             throw new ServiceDisabledException(AppConst.ErrorMessages.SERVICE_NOT_RUNNING);
         }
+        if (grantedAccess != null && grantedAccess.isAlive()) {
+            grantedAccess.interrupt();
+        }
         expectedChange = true;
         machineConfig.setUsbEnable(false);
-        usbMemoryManager.removeExternalDrives();
-        usbMemoryManager.disableAccess();
+        machineConfig.saveConfig();
+        try {
+            usbMemoryManager.removeExternalDrives();
+        } catch (Win32Exception e) {
+            statusManager.generateLog(LogType.ERROR, "Couldnt eject drives during forceClose: " + e.getMessage());
+        }
+        try {
+            usbMemoryManager.disableAccess();
+        } catch (Win32Exception e) {
+            statusManager.generateLog(LogType.ERROR, "Couldnt disable USB access during forceClose: " + e.getMessage());
+        }
+        expectedChange = false;
     }
 
     @Override

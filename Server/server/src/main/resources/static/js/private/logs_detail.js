@@ -53,7 +53,9 @@ function renderLog(log) {
     document.getElementById('machine-ip').textContent   = log.machine?.ip   ?? '—';
 
     const container = document.getElementById('log-container');
-    container.className = `log-detail-container mb-4 ${type.cssClass}`;
+    const isInfo = log.logCode === 1001;
+    const colorClass = (log.needsRevission || isInfo) ? type.cssClass : 'log-revised';
+    container.className = `log-detail-container mb-4 ${colorClass}`;
 
     const rows = [
         ['Code',          `Code ${log.logCode}, ${escapeHtml(type.description)}`],
@@ -93,7 +95,7 @@ document.getElementById('confirm-revise-btn').addEventListener('click', function
         .then(res => res.ok ? res : res.text().then(t => Promise.reject(t)))
         .then(() => {
             bootstrap.Modal.getInstance(document.getElementById('reviseModal')).hide();
-            window.location.href = '/logs';
+            window.location.href = window.BACK_URL || '/logs';
         })
         .catch(err => {
             bootstrap.Modal.getInstance(document.getElementById('reviseModal')).hide();
