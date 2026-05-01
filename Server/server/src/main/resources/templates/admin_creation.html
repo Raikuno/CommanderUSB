@@ -36,11 +36,11 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" required minlength="8">
+                            <input type="password" class="form-control" id="password" name="password" required minlength="8" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}" title="At least 8 characters, including an uppercase letter, a lowercase letter and a digit">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="confirmPassword" class="form-label">Confirm Password</label>
-                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required minlength="8">
+                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required minlength="8" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}" title="At least 8 characters, including an uppercase letter, a lowercase letter and a digit">
                         </div>
                     </div>
 
@@ -52,6 +52,7 @@
             </div>
         </div>
     </main>
+    <script th:src="@{/js/public/utils.js}"></script>
     <script th:src="@{/js/public/admin_creation_script.js}"></script>
 </body>
 </html>

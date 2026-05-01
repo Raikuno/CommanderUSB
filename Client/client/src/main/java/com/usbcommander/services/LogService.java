@@ -35,35 +35,36 @@ public class LogService extends CommanderService{
         return instance;
     }
 
-    public void changeLogFrecuency(long frecuency){
-        machineConfig.setLogFrecuency(frecuency);
-        machineConfig.saveConfig();
-    }
-
     @Override
     public void run() {
         while(running){
             try {
                 Thread.sleep(machineConfig.getLogFrecuency());
                 statusManager.generateLog();
-                List<LogDTO> history = statusManager.getHistory();
-                try { 
-                    String message = mapper.writeValueAsString(history);
-                    boolean sended = ServerConnectionService.getInstance().sendMessage(message);
-                    if(sended){
-                        statusManager.deleteHistory();
-                    }
-                } catch (ServiceDisabledException | NotConnectionException e) {
-                    statusManager.generateLog(LogType.ERROR, e.getMessage());
-                } catch (JsonProcessingException e) {
-                    statusManager.generateLog(LogType.ERROR, AppConst.ErrorMessages.JACKSON_ERROR_TEXT + e.getMessage());
-                }
-            } catch (InterruptedException e) {
+                sendLogs();
+            } catch (InterruptedException | ServiceDisabledException e ) {
                 statusManager.generateLog(LogType.ERROR, e.getMessage());
                 running = false;
             }
         }
     }
 
+    public void sendLogs() throws ServiceDisabledException{
+        if(!running){
+            throw new ServiceDisabledException(AppConst.ErrorMessages.SERVICE_NOT_RUNNING);
+        }
+        List<LogDTO> history = statusManager.getHistory();
+        try { 
+            String message = mapper.writeValueAsString(history);
+            boolean sended = ServerConnectionService.getInstance().sendMessage(message);
+            if(sended){
+                statusManager.deleteHistory();
+            }
+        } catch (ServiceDisabledException | NotConnectionException e) {
+            statusManager.generateLog(LogType.ERROR, e.getMessage());
+        } catch (JsonProcessingException e) {
+            statusManager.generateLog(LogType.ERROR, AppConst.ErrorMessages.JACKSON_ERROR_TEXT + e.getMessage());
+        }
+    }
     
 }

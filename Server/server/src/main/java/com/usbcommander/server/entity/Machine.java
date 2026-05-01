@@ -36,8 +36,8 @@ public class Machine {
     @Column(nullable=false, columnDefinition="boolean default false")
     private Boolean disable;
 
-    @Column(nullable=false, columnDefinition="unsigned int default 300000", name = "log_frec")
-    private Integer logFrecuency;
+    @Column(nullable=false, columnDefinition="bigint unsigned default 300000", name = "log_frec")
+    private Long logFrecuency;
 
     public UUID getId() {
         return id;
@@ -79,11 +79,11 @@ public class Machine {
         this.disable = disable;
     }
 
-    public Integer getLogFrecuency() {
+    public Long getLogFrecuency() {
         return logFrecuency;
     }
 
-    public void setLogFrecuency(Integer logFrecuency) {
+    public void setLogFrecuency(Long logFrecuency) {
         this.logFrecuency = logFrecuency;
     }
 

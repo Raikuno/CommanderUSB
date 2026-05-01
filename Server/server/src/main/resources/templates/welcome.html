@@ -15,7 +15,7 @@
     <main>
         <h1 class="mb-5 mt-5">Welcome back <span th:text="${#authentication.principal.user.name}"></span></h1>
 
-        <div th:replace="fragments/machine_list :: machineList"></div>
+        <div sec:authorize="hasAuthority('VIEW_LOGS') or hasAuthority('SOLVE_LOGS')" th:replace="fragments/machine_list :: machineList"></div>
 
     </main>
     

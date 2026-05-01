@@ -26,14 +26,18 @@ import com.usbcommander.server.entity.User;
 import com.usbcommander.server.service.IPermissionService;
 import com.usbcommander.server.service.IRoleService;
 import com.usbcommander.server.service.IUserService;
+import com.usbcommander.server.utils.Validations;
 
 @RestController
 @RequestMapping("/api/users")
 public class UserAdministrationApiController {
 
-    @Autowired private IUserService userService;
-    @Autowired private IRoleService roleService;
-    @Autowired private IPermissionService permissionService;
+    @Autowired 
+    private IUserService userService;
+    @Autowired 
+    private IRoleService roleService;
+    @Autowired 
+    private IPermissionService permissionService;
 
     @GetMapping({"", "/"})
     public ResponseEntity<List<User>> getAllUsers() {
@@ -46,6 +50,12 @@ public class UserAdministrationApiController {
                 || user.get("email") == null || user.get("email").isBlank()
                 || user.get("password") == null || user.get("password").isBlank()) {
             return ResponseEntity.badRequest().body("Name, email and password are required");
+        }
+        if (!Validations.isValidEmail(user.get("email"))) {
+            return ResponseEntity.badRequest().body(Validations.EMAIL_REQUIREMENTS);
+        }
+        if (!Validations.isValidPassword(user.get("password"))) {
+            return ResponseEntity.badRequest().body(Validations.PASSWORD_REQUIREMENTS);
         }
         if (userService.getByEmail(user.get("email")).isPresent()) {
             return ResponseEntity.badRequest().body("Email already in use");
@@ -94,6 +104,10 @@ public class UserAdministrationApiController {
         String email = data.get("email");
         if (name == null || name.isBlank() || email == null || email.isBlank()) {
             return ResponseEntity.badRequest().body("Name and email are required");
+        }
+
+        if (!Validations.isValidEmail(email)) {
+            return ResponseEntity.badRequest().body(Validations.EMAIL_REQUIREMENTS);
         }
 
         Optional<User> byName = userService.getByName(name);

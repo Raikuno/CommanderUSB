@@ -68,7 +68,7 @@ public class MachineConfig extends IMachineConfig{
                 AppConst.ConfigReferences.LOG_ENTRY, 
                 logFrecuency);
 
-            if(ip != null || port != null){
+            if(ip != null && port != null){
                 Advapi32Util.registrySetIntValue(
                     AppConst.MAIN_LOCATION, 
                     AppConst.ConfigReferences.CONFIG_LOCATION, 

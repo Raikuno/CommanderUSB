@@ -1,33 +1,3 @@
-function showAlert(msg, type) {
-    document.getElementById('alert-container').innerHTML =
-        `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
-            ${msg}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>`;
-}
-
-function renderPermissions(permissions, selectedIds) {
-    const container = document.getElementById('permissions-container');
-    if (!permissions.length) {
-        container.innerHTML = '<span class="text-muted small">No permissions available</span>';
-        return;
-    }
-    container.innerHTML = permissions.map(p => `
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox"
-                   id="perm-${p.id}" value="${p.id}"
-                   ${selectedIds.includes(p.id) ? 'checked' : ''}>
-            <label class="form-check-label" for="perm-${p.id}">${p.name}</label>
-        </div>
-    `).join('');
-}
-
-function getCheckedPermissions() {
-    return Array.from(
-        document.querySelectorAll('#permissions-container input[type=checkbox]:checked')
-    ).map(cb => cb.value);
-}
-
 document.getElementById('role-form').addEventListener('submit', function (e) {
     e.preventDefault();
     const btn = document.getElementById('submit-btn');
@@ -50,6 +20,24 @@ document.getElementById('role-form').addEventListener('submit', function (e) {
         btn.disabled = false;
     });
 });
+
+
+function renderPermissions(permissions, selectedIds) {
+    const container = document.getElementById('permissions-container');
+    if (!permissions.length) {
+        container.innerHTML = '<span class="text-muted small">No permissions available</span>';
+        return;
+    }
+    container.innerHTML = permissions.map(p => `
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox"
+                   id="perm-${p.id}" value="${p.id}"
+                   ${selectedIds.includes(p.id) ? 'checked' : ''}>
+            <label class="form-check-label" for="perm-${p.id}">${p.name}</label>
+        </div>
+    `).join('');
+}
+
 
 Promise.all([
     fetch('/api/users/permissions').then(r => {

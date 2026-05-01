@@ -43,10 +43,10 @@
                             >
                         </div>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item" sec:authorize="hasAuthority('MACHINE_MANAGEMENT')">
                         <a class="nav-link" th:href="@{/machines}">Machines</a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item" sec:authorize="hasAuthority('VIEW_LOGS')">
                         <a class="nav-link" th:href="@{/logs}">Logs</a>
                     </li>
                 </ul>

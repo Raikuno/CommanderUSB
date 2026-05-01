@@ -20,8 +20,8 @@
     </div>
 
     <div class="mb-4">
-        <a th:href="@{/users}" class="btn btn-outline-secondary me-2">Users</a>
-        <a th:href="@{/users/permissions}" class="btn btn-outline-secondary">Permissions</a>
+        <a th:href="@{/users}" class="btn btn-outline-secondary me-2" sec:authorize="hasAuthority('USER_MANAGEMENT')">Users</a>
+        <a th:href="@{/users/permissions}" class="btn btn-outline-secondary" sec:authorize="hasAuthority('MANAGE_ROLES')">Permissions</a>
     </div>
 
     <div id="alert-container"></div>
@@ -31,6 +31,7 @@
     </div>
 
 </main>
+<script th:src="@{/js/public/utils.js}"></script>
 <script th:src="@{/js/private/roles_index.js}"></script>
 </body>
 </html>

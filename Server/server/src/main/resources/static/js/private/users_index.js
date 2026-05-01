@@ -1,19 +1,3 @@
-function escapeHtml(str) {
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-}
-
-function showAlert(msg, type) {
-    document.getElementById('alert-container').innerHTML =
-        `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
-            ${escapeHtml(msg)}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>`;
-}
-
 function renderUsers(users) {
     const tbody = document.getElementById('users-tbody');
     if (!users.length) {

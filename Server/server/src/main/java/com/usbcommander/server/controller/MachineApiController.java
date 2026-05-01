@@ -132,6 +132,8 @@ public class MachineApiController {
             ConfigDTO configDTO = new ConfigDTO();
             if(logFrecuency != null){            
                 configDTO.setFrecuency(logFrecuency);
+                selectedMachine.get().setLogFrecuency(logFrecuency);
+                machineService.save(selectedMachine.get());
             }
 
             if (enableUsb != null) {

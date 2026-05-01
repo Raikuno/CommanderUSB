@@ -94,7 +94,7 @@ public class ServerConnectionService extends CommanderService{
                     ConfigDTO newConfig = mapper.readValue(message, ConfigDTO.class);
 
                     if(newConfig.getFrecuency() != null){
-                        LogService.getInstance().changeLogFrecuency(newConfig.getFrecuency());
+                        SecurityService.getInstance().changeLogFrecuency(newConfig.getFrecuency());
                     }
 
                     if(newConfig.isAllow() != null && newConfig.isAllow() && newConfig.getAllowedTime() != null){

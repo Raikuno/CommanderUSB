@@ -66,7 +66,7 @@ public class MachineTalker {
             newMachine.setName(ip);
             newMachine.setIp(ip);
             newMachine.setDisable(false);
-            newMachine.setLogFrecuency(300000);
+            newMachine.setLogFrecuency(300000L);
             newMachine.setRegisteredDate(LocalDateTime.now());
             machineService.save(newMachine);
 

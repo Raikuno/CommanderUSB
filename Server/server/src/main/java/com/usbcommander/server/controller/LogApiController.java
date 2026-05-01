@@ -23,8 +23,10 @@ import com.usbcommander.server.service.IMachineService;
 @RequestMapping("/api/logs")
 public class LogApiController {
 
-    @Autowired private ILogService logService;
-    @Autowired private IMachineService machineService;
+    @Autowired 
+    private ILogService logService;
+    @Autowired 
+    private IMachineService machineService;
 
     @GetMapping("/unrevised")
     public ResponseEntity<List<Log>> getUnrevised() {

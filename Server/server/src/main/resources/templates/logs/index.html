@@ -16,7 +16,7 @@
 
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2>Unrevised Logs</h2>
-        <button class="btn btn-primary" id="mark-revised-btn">Mark as Revised</button>
+        <button class="btn btn-primary" id="mark-revised-btn" sec:authorize="hasAuthority('SOLVE_LOGS')">Mark as Revised</button>
     </div>
 
     <div id="alert-container" class="mb-2"></div>
@@ -30,7 +30,7 @@
                     <th>Type</th>
                     <th></th>
                     <th></th>
-                    <th><input type="checkbox" id="select-all"></th>
+                    <th sec:authorize="hasAuthority('SOLVE_LOGS')"><input type="checkbox" id="select-all"></th>
                 </tr>
             </thead>
             <tbody id="logs-tbody">
@@ -61,6 +61,7 @@
     </div>
 </div>
 
+<script th:src="@{/js/public/utils.js}"></script>
 <script th:src="@{/js/private/logs_index.js}"></script>
 </body>
 </html>

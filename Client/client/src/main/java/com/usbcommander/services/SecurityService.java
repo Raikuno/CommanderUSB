@@ -1,13 +1,9 @@
 package com.usbcommander.services;
 
-import java.util.List;
 import java.util.function.Consumer;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.sun.jna.platform.win32.Advapi32;
+import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.Win32Exception;
 import com.sun.jna.platform.win32.WinError;
 import com.sun.jna.platform.win32.WinNT;
@@ -15,9 +11,7 @@ import com.sun.jna.platform.win32.WinReg.HKEYByReference;
 import com.usbcommander.AppConst;
 import com.usbcommander.config.MachineConfig;
 import com.usbcommander.config.contract.IMachineConfig;
-import com.usbcommander.dto.LogDTO;
 import com.usbcommander.enums.LogType;
-import com.usbcommander.errors.NotConnectionException;
 import com.usbcommander.errors.ServiceDisabledException;
 import com.usbcommander.managers.StatusManager;
 import com.usbcommander.managers.UsbMemoryManager;
@@ -29,8 +23,6 @@ public class SecurityService extends CommanderService{
 
     private static SecurityService instance;
 
-    private ObjectMapper mapper; 
-    private boolean expectedChange = false;
     private Thread usbStorListener;
     private Thread appConfigListener;
     private IUsbMemoryManager usbMemoryManager;
@@ -43,34 +35,92 @@ public class SecurityService extends CommanderService{
         this.usbMemoryManager = UsbMemoryManager.getInstance();
         this.statusManager = StatusManager.getInstance();
         this.machineConfig = MachineConfig.getInstance();
-
-        mapper = new ObjectMapper().registerModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
         usbStorListener = setListenerOn(AppConst.RegistryReferences.USB_STOR, () -> {
-            if(!machineConfig.isUsbEnable()){
-                    LogDTO log = statusManager.generateLog(LogType.REGISTRY_MOD);
-                    usbMemoryManager.removeExternalDrives();
-                    try{
-                        forceClose();
-                    }catch(ServiceDisabledException err){
-                        statusManager.generateLog(LogType.ERROR, err.getMessage());
-                    }
-                    sendLog(log);
-                    System.out.println("Stor changed");
+            if(usbStorMatchesMemory()){
+                return;
+            }
+            statusManager.generateLog(LogType.REGISTRY_MOD);
+            try{
+                forceClose();
+            }catch(ServiceDisabledException err){
+                statusManager.generateLog(LogType.ERROR, err.getMessage());
+            }
+            try {
+                LogService.getInstance().sendLogs();
+            } catch (ServiceDisabledException e) {
+                statusManager.generateLog(LogType.ERROR, e.getMessage());
             }
         }, null);
-        
+
         appConfigListener = setListenerOn(AppConst.ConfigReferences.CONFIG_LOCATION, () -> {
-            if(!expectedChange){
-                expectedChange = true;
-                LogDTO log = statusManager.generateLog(LogType.CONFIG_MOD);
-                machineConfig.saveConfig();
-                sendLog(log);
-                System.out.println("Config changed");
-            } else {
-                expectedChange = false;
+            if(configMatchesMemory()){
+                return;
+            }
+            statusManager.generateLog(LogType.CONFIG_MOD);
+            machineConfig.saveConfig();
+            try {
+                LogService.getInstance().sendLogs();
+            } catch (ServiceDisabledException e) {
+                statusManager.generateLog(LogType.ERROR, e.getMessage());
             }
         }, null);
+    }
+
+    /**
+     * Compares the current USBSTOR\Start value with the expected value derived from the in-memory machineConfig state.
+     * @return true if the registry matches memory (an internal/expected change), false on mismatch (tampering)
+     */
+    private boolean usbStorMatchesMemory(){
+        try{
+            int expected = machineConfig.isUsbEnable()
+                ? AppConst.RegistryReferences.ENABLE_VALUE
+                : AppConst.RegistryReferences.DISABLE_VALUE;
+            return usbMemoryManager.getAccessValue() == expected;
+        }catch(Win32Exception err){
+            return false;
+        }
+    }
+
+    /**
+     * Compares the current config registry values with the in-memory machineConfig state.
+     * @return true if every persisted field matches memory, false otherwise
+     */
+    private boolean configMatchesMemory(){
+        try{
+            int regUsb = Advapi32Util.registryGetIntValue(
+                AppConst.MAIN_LOCATION,
+                AppConst.ConfigReferences.CONFIG_LOCATION,
+                AppConst.ConfigReferences.USB_ALLOW_ENTRY);
+            if((regUsb == 1) != machineConfig.isUsbEnable()){
+                return false;
+            }
+
+            long regLog = Advapi32Util.registryGetLongValue(
+                AppConst.MAIN_LOCATION,
+                AppConst.ConfigReferences.CONFIG_LOCATION,
+                AppConst.ConfigReferences.LOG_ENTRY);
+            if(regLog != machineConfig.getLogFrecuency()){
+                return false;
+            }
+
+            if(machineConfig.getIp() != null){
+                String regIp = Advapi32Util.registryGetStringValue(
+                    AppConst.MAIN_LOCATION,
+                    AppConst.ConfigReferences.CONFIG_LOCATION,
+                    AppConst.ConfigReferences.IP_ENTRY);
+                int regPort = Advapi32Util.registryGetIntValue(
+                    AppConst.MAIN_LOCATION,
+                    AppConst.ConfigReferences.CONFIG_LOCATION,
+                    AppConst.ConfigReferences.PORT_ENTRY);
+                if(!machineConfig.getIp().equals(regIp) || regPort != machineConfig.getPort()){
+                    return false;
+                }
+            }
+
+            return true;
+        }catch(Win32Exception err){
+            return false;
+        }
     }
 
     public static SecurityService getInstance(){
@@ -95,18 +145,16 @@ public class SecurityService extends CommanderService{
         }
         grantedAccess = new Thread(() -> {
             try {
-                machineConfig.setUsbEnable(true);
-                machineConfig.saveConfig();
-                usbMemoryManager.enableAccess();
                 try {
+                    machineConfig.setUsbEnable(true);
+                    machineConfig.saveConfig();
+                    usbMemoryManager.enableAccess();
                     Thread.sleep(grantedFor);
-                } catch (InterruptedException e) {
-                    statusManager.generateLog(LogType.ERROR, "Open access thread interrupted: " + e.getMessage());
+                } catch (Win32Exception e) {
+                    statusManager.generateLog(LogType.ERROR, "Failed to enable USB access: " + e.getMessage());
                 }
-            } catch (Win32Exception e) {
-                statusManager.generateLog(LogType.ERROR, "Failed to enable USB access: " + e.getMessage());
-            } finally {
                 machineConfig.setUsbEnable(false);
+                machineConfig.saveConfig();
                 try {
                     usbMemoryManager.removeExternalDrives();
                 } catch (Win32Exception e) {
@@ -117,6 +165,8 @@ public class SecurityService extends CommanderService{
                 } catch (Win32Exception e) {
                     statusManager.generateLog(LogType.ERROR, "Couldnt disable USB access: " + e.getMessage());
                 }
+            } catch (InterruptedException e) {
+                    statusManager.generateLog(LogType.ERROR, "Open access thread interrupted: " + e.getMessage());
             }
         });
         grantedFor = time;
@@ -130,9 +180,6 @@ public class SecurityService extends CommanderService{
      * This method forces to close the access to usb storage units
      * @return A boolean representing if the operation was succesful
      * @throws ServiceDisabledException 
-                } else {
-                    expectedChange = false;
-                }
      */
     public void forceClose() throws ServiceDisabledException{
         if(!running){
@@ -141,7 +188,6 @@ public class SecurityService extends CommanderService{
         if (grantedAccess != null && grantedAccess.isAlive()) {
             grantedAccess.interrupt();
         }
-        expectedChange = true;
         machineConfig.setUsbEnable(false);
         machineConfig.saveConfig();
         try {
@@ -154,7 +200,11 @@ public class SecurityService extends CommanderService{
         } catch (Win32Exception e) {
             statusManager.generateLog(LogType.ERROR, "Couldnt disable USB access during forceClose: " + e.getMessage());
         }
-        expectedChange = false;
+    }
+
+    public void changeLogFrecuency(long frecuency){
+        machineConfig.setLogFrecuency(frecuency);
+        machineConfig.saveConfig();
     }
 
     @Override
@@ -221,18 +271,6 @@ public class SecurityService extends CommanderService{
             return true;
         } catch(IllegalThreadStateException err){
             return false;
-        }
-    }
-
-    private void sendLog(LogDTO log){
-        List<LogDTO> logList = List.of(log);
-        try { 
-            String message = mapper.writeValueAsString(logList);
-            ServerConnectionService.getInstance().sendMessage(message);
-        } catch (ServiceDisabledException | NotConnectionException e ) {
-            StatusManager.getInstance().generateLog(LogType.ERROR, e.getMessage());
-        } catch (JsonProcessingException e) {
-            statusManager.generateLog(LogType.ERROR, AppConst.ErrorMessages.JACKSON_ERROR_TEXT + e.getMessage());
         }
     }
 }

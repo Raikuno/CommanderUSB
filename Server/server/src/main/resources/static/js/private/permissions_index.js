@@ -1,11 +1,3 @@
-function showAlert(msg, type) {
-    document.getElementById('alert-container').innerHTML =
-        `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
-            ${msg}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>`;
-}
-
 fetch('/api/users/permissions')
     .then(res => {
         if (!res.ok) throw new Error(res.status);

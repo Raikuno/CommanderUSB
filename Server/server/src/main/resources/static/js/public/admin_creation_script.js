@@ -10,26 +10,25 @@ form.addEventListener('submit', async function(e){
     const password = formData.get('password');
     const confirm = formData.get('confirmPassword');
 
-    if(email === "" || !new RegExp(/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{1,}$/).test(email)){
-        email.classList.add('is-invalid');
-        email.style.borderColor = 'red';
-        alert('Email not valid');
+    if(!isValidEmail(email)){
+        document.getElementById('email').classList.add('is-invalid');
+        alert(EMAIL_REQUIREMENTS);
+        submitBtn.disabled = false;
         return;
     }
 
     if(name === ""){
-        name.classList.add('is-invalid');
-        name.style.borderColor = 'red';
+        document.getElementById('name').classList.add('is-invalid');
         alert('Name is required');
+        submitBtn.disabled = false;
         return;
     }
 
-    if(password === "" || password.length < 8){
-        password.classList.add('is-invalid');
-        password.style.borderColor = 'red';
-        alert('Password must be at least 8 characters long');
+    if(!isValidPassword(password)){
+        document.getElementById('password').classList.add('is-invalid');
+        alert(PASSWORD_REQUIREMENTS);
+        submitBtn.disabled = false;
         return;
-
     }
 
     if(password !== confirm){

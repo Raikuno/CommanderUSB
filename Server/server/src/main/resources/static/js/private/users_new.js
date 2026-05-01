@@ -1,11 +1,3 @@
-function showAlert(msg, type) {
-    document.getElementById('alert-container').innerHTML =
-        `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
-            ${msg}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>`;
-}
-
 function loadRoles() {
     fetch('/api/users/roles')
         .then(res => {
@@ -27,7 +19,6 @@ function loadRoles() {
 document.getElementById('new-user-form').addEventListener('submit', function (e) {
     e.preventDefault();
     const btn = document.getElementById('submit-btn');
-    btn.disabled = true;
 
     const payload = {
         name: document.getElementById('name').value.trim(),
@@ -35,6 +26,18 @@ document.getElementById('new-user-form').addEventListener('submit', function (e)
         password: document.getElementById('password').value,
         roleId: document.getElementById('role').value || null
     };
+
+    if (!isValidEmail(payload.email)) {
+        showAlert(EMAIL_REQUIREMENTS, 'danger');
+        return;
+    }
+
+    if (!isValidPassword(payload.password)) {
+        showAlert(PASSWORD_REQUIREMENTS, 'danger');
+        return;
+    }
+
+    btn.disabled = true;
 
     fetch('/api/users/createUser', {
         method: 'POST',

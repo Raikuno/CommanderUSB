@@ -1,14 +1,10 @@
 package com.usbcommander.server.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import com.usbcommander.server.AppConst;
 import com.usbcommander.server.service.IFirstStartService;
 
 
