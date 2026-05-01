@@ -36,14 +36,13 @@
             </tbody>
         </table>
         <div class="text-end">
-            <button class="btn btn-success" id="revise-btn" disabled>Mark as Revised</button>
+            <button class="btn btn-success" id="revise-btn" disabled sec:authorize="hasAuthority('SOLVE_LOGS')">Mark as Revised</button>
         </div>
     </div>
 
 </main>
 
-<!-- Confirm revision modal -->
-<div class="modal fade" id="reviseModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="reviseModal" tabindex="-1" aria-hidden="true" sec:authorize="hasAuthority('SOLVE_LOGS')"> 
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -62,6 +61,7 @@
 </div>
 
 <script th:inline="javascript">window.LOG_ID = /*[[${logId}]]*/ '';</script>
+<script th:src="@{/js/public/utils.js}"></script>
 <script th:src="@{/js/private/logs_detail.js}"></script>
 </body>
 </html>

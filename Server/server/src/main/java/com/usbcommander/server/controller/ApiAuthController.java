@@ -19,8 +19,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.usbcommander.server.AppConst;
 import com.usbcommander.server.entity.User;
 import com.usbcommander.server.service.IFirstStartService;
-import com.usbcommander.server.service.JwtService;
+import com.usbcommander.server.service.IJwtService;
+import com.usbcommander.server.service.ISessionService;
 import com.usbcommander.server.service.UserService;
+import com.usbcommander.server.utils.Validations;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.web.bind.annotation.GetMapping;
 
 
@@ -31,11 +37,13 @@ public class ApiAuthController {
     @Autowired
     private AuthenticationManager authenticationManager;
     @Autowired
-    private JwtService jwtUtils;
+    private IJwtService jwtService;
     @Autowired
     private UserService userService;
     @Autowired
     private IFirstStartService loginService;
+    @Autowired
+    private ISessionService sessionService;
 
     @PostMapping("/firstuser")
     public ResponseEntity<String> getMethodName(@RequestBody Map<String, String> payload) {
@@ -46,16 +54,16 @@ public class ApiAuthController {
         var password = payload.getOrDefault("password", "").trim();
         var name = payload.getOrDefault("name", "").trim();
 
-        if(email.isBlank()){
-            return ResponseEntity.badRequest().body("Email is required");
-        }
-
-        if (password.isBlank() || password.length() < 8) {
-            return ResponseEntity.badRequest().body("Password is invalid");
-        }
-
         if (name.isBlank()) {
             return ResponseEntity.badRequest().body("Name is required");
+        }
+
+        if (!Validations.isValidEmail(email)) {
+            return ResponseEntity.badRequest().body(Validations.EMAIL_REQUIREMENTS);
+        }
+
+        if (!Validations.isValidPassword(password)) {
+            return ResponseEntity.badRequest().body(Validations.PASSWORD_REQUIREMENTS);
         }
 
         try {
@@ -70,6 +78,11 @@ public class ApiAuthController {
     public ResponseEntity<?> login(@RequestBody Map<String, String> body) {
         String email = body.getOrDefault("email", "").trim();
         String password = body.getOrDefault("password", "").trim();
+
+        if (!Validations.isValidEmail(email)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
+        }
+
         try {
             authenticationManager
                     .authenticate(new UsernamePasswordAuthenticationToken(email, password));
@@ -77,29 +90,93 @@ public class ApiAuthController {
             Optional<User> op = userService.getByEmail(email);
             if (op.isEmpty()) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             User user = op.get();
-            String accessToken = jwtUtils.generateAccessToken(user);
-            //String refreshToken = jwtUtils.generateRefreshToken(user);
+            String accessToken = jwtService.generateAccessToken(user);
+            String refreshToken = jwtService.generateRefreshToken(user);
+            sessionService.createSession(user, refreshToken);
+            ResponseCookie refreshCookie = ResponseCookie.from(AppConst.REFRESH_TOKEN_NAME, refreshToken)
+            .httpOnly(true)
+            .path("/")
+            .secure(true)
+            .sameSite("Strict")
+            .maxAge(jwtService.getRefreshTokenSeconds())
+            .build();
             ResponseCookie authCookie = ResponseCookie.from(AppConst.ACCESS_TOKEN_NAME, accessToken)
                     .httpOnly(true)
                     .path("/")
                     .secure(true)
                     .sameSite("Strict")
-                    .maxAge(jwtUtils.getAccessTokenSeconds())
+                    .maxAge(jwtService.getAccessTokenSeconds())
                     .build();
             return ResponseEntity.ok()
             .header(HttpHeaders.SET_COOKIE, authCookie.toString())
+            .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
             .body(Map.of(
                     "access_token", accessToken,
+                    "refresh_token", refreshToken,
                     "token_type", "bearer",
-                    "expires_in", jwtUtils.getAccessTokenSeconds()));
+                    "expires_in", jwtService.getAccessTokenSeconds()));
         } catch (AuthenticationException ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
         }
     }
 
-    @GetMapping
-    ("/logout")
-    public ResponseEntity<?> logout() {
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refresh(@RequestBody(required = false) Map<String, String> body,
+            HttpServletRequest request) {
+        String refreshToken = null;
+
+        if (body != null && body.containsKey("refresh_token")) {
+            refreshToken = body.get("refresh_token");
+        }
+
+        if (refreshToken == null && request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if (AppConst.REFRESH_TOKEN_NAME.equals(cookie.getName())) {
+                    refreshToken = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        if (refreshToken == null
+                || !jwtService.isRefreshToken(refreshToken)
+                || !jwtService.validateToken(refreshToken)
+                || sessionService.findValidSession(refreshToken).isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired refresh token");
+        }
+
+        String email = jwtService.getEmailFromToken(refreshToken);
+        Optional<User> user = userService.getByEmail(email);
+        if (user.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired refresh token");
+        }
+
+        String newAccessToken = jwtService.generateAccessToken(user.get());
+        ResponseCookie authCookie = ResponseCookie.from(AppConst.ACCESS_TOKEN_NAME, newAccessToken)
+                .httpOnly(true)
+                .path("/")
+                .secure(true)
+                .sameSite("Strict")
+                .maxAge(jwtService.getAccessTokenSeconds())
+                .build();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, authCookie.toString())
+                .body(Map.of(
+                        "access_token", newAccessToken,
+                        "token_type", "bearer",
+                        "expires_in", jwtService.getAccessTokenSeconds()));
+    }
+
+    @GetMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request) {
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if (AppConst.REFRESH_TOKEN_NAME.equals(cookie.getName())) {
+                    sessionService.invalidateSession(cookie.getValue());
+                    break;
+                }
+            }
+        }
         ResponseCookie authCookie = ResponseCookie.from(AppConst.ACCESS_TOKEN_NAME, "")
                 .httpOnly(true)
                 .path("/")
@@ -107,11 +184,16 @@ public class ApiAuthController {
                 .sameSite("Strict")
                 .maxAge(0)
                 .build();
+        ResponseCookie refreshCookie = ResponseCookie.from(AppConst.REFRESH_TOKEN_NAME, "")
+                .httpOnly(true)
+                .path("/")
+                .secure(true)
+                .sameSite("Strict")
+                .maxAge(0)
+                .build();
         return ResponseEntity.ok()
-        .header(HttpHeaders.SET_COOKIE, authCookie.toString())
-        .body(Map.of(
-                "access_token", "",
-                "token_type", "bearer",
-                "expires_in", 0));
+                .header(HttpHeaders.SET_COOKIE, authCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                .body(Map.of("access_token", "", "token_type", "bearer", "expires_in", 0));
     }
 }

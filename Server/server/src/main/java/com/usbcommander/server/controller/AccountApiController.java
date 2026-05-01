@@ -14,14 +14,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.usbcommander.server.entity.User;
 import com.usbcommander.server.security.CommanderUserDetails;
+import com.usbcommander.server.service.ISessionService;
 import com.usbcommander.server.service.IUserService;
+import com.usbcommander.server.utils.Validations;
 
 @RestController
 @RequestMapping("/api/account")
 public class AccountApiController {
 
-    @Autowired private IUserService userService;
-    @Autowired private PasswordEncoder passwordEncoder;
+    @Autowired 
+    private IUserService userService;
+    @Autowired 
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private ISessionService sessionService;
 
     @PostMapping("/change-password")
     public ResponseEntity<?> changePassword(
@@ -35,14 +41,14 @@ public class AccountApiController {
         String newPassword = data.get("newPassword");
         String confirmPassword = data.get("confirmPassword");
 
-        if(newPassword.length() < 8){
-            return ResponseEntity.badRequest().body("New password is invalid");
-        }
-
         if (currentPassword == null || currentPassword.isBlank()
                 || newPassword == null || newPassword.isBlank()
                 || confirmPassword == null || confirmPassword.isBlank()) {
             return ResponseEntity.badRequest().body("All fields are required");
+        }
+
+        if (!Validations.isValidPassword(newPassword)) {
+            return ResponseEntity.badRequest().body(Validations.PASSWORD_REQUIREMENTS);
         }
 
         if (!newPassword.equals(confirmPassword)) {
@@ -59,6 +65,7 @@ public class AccountApiController {
         }
 
         userService.updatePassword(user, newPassword);
+        sessionService.invalidateAllUserSessions(user);
         return ResponseEntity.ok().build();
     }
 }

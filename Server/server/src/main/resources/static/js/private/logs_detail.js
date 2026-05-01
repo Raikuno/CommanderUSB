@@ -8,32 +8,6 @@ const LOG_TYPES = {
     1007: { label: 'Application Error',       cssClass: 'log-critical', description: 'An error occurred in the application' }
 };
 
-function showAlert(msg, type) {
-    document.getElementById('alert-container').innerHTML =
-        `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
-            ${msg}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>`;
-}
-
-function escapeHtml(str) {
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-}
-
-function formatDate(date) {
-    if (!date) return '—';
-    if (Array.isArray(date)) {
-        const [y, mo, d, h, m, s] = date;
-        return `${y}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')} `
-             + `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s||0).padStart(2,'0')}`;
-    }
-    return new Date(date).toLocaleString();
-}
-
 function usbValueMessage(val) {
     if (val === 3) return `${val} — this means the machine would allow a USB to be mounted`;
     if (val === 4) return `${val} — this means the machine would not be able to mount USB drives`;
@@ -73,7 +47,9 @@ function renderLog(log) {
             </tr>`)
         .join('');
 
-    document.getElementById('revise-btn').disabled = !log.needsRevission;
+    if(document.getElementById('revise-btn') !== null){
+        document.getElementById('revise-btn').disabled = !log.needsRevission;
+    }
 }
 
 function loadLog() {
@@ -83,25 +59,30 @@ function loadLog() {
         .catch(() => showAlert('Could not load log data.', 'danger'));
 }
 
-document.getElementById('revise-btn').addEventListener('click', function () {
-    new bootstrap.Modal(document.getElementById('reviseModal')).show();
-});
+if(document.getElementById('revise-btn') !== null){
+    document.getElementById('revise-btn').addEventListener('click', function () {
+        new bootstrap.Modal(document.getElementById('reviseModal')).show();
+    });
+}
 
-document.getElementById('confirm-revise-btn').addEventListener('click', function () {
-    const btn = this;
-    btn.disabled = true;
+if(document.getElementById('confirm-revise-btn') !== null){
+    document.getElementById('confirm-revise-btn').addEventListener('click', function () {
+        const btn = this;
+        btn.disabled = true;
 
-    fetch(`/api/logs/${window.LOG_ID}/revise`, { method: 'PATCH' })
-        .then(res => res.ok ? res : res.text().then(t => Promise.reject(t)))
-        .then(() => {
-            bootstrap.Modal.getInstance(document.getElementById('reviseModal')).hide();
-            window.location.href = window.BACK_URL || '/logs';
-        })
-        .catch(err => {
-            bootstrap.Modal.getInstance(document.getElementById('reviseModal')).hide();
-            showAlert(err || 'Failed to mark log as revised.', 'danger');
-            btn.disabled = false;
-        });
-});
+        fetch(`/api/logs/${window.LOG_ID}/revise`, { method: 'PATCH' })
+            .then(res => res.ok ? res : res.text().then(t => Promise.reject(t)))
+            .then(() => {
+                bootstrap.Modal.getInstance(document.getElementById('reviseModal')).hide();
+                window.location.href = window.BACK_URL || '/logs';
+            })
+            .catch(err => {
+                bootstrap.Modal.getInstance(document.getElementById('reviseModal')).hide();
+                showAlert(err || 'Failed to mark log as revised.', 'danger');
+                btn.disabled = false;
+            });
+    });
+}
+
 
 loadLog();

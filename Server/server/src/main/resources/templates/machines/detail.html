@@ -78,7 +78,7 @@
             <form id="config-form" class="card card-body mb-4">
                 <h5 class="card-title mb-3">Machine Configuration</h5>
                 <div class="row mb-2 align-items-center">
-                    <label for="cfg-log-frec" class="col-sm-5 col-form-label">Log Frecuency</label>
+                    <label for="cfg-log-frec" class="col-sm-5 col-form-label">Log Frecuency (milliseconds)</label>
                     <div class="col-sm-7">
                         <input type="number" id="cfg-log-frec" class="form-control" min="0">
                     </div>
@@ -92,7 +92,7 @@
                     </div>
                 </div>
                 <div class="row mb-3 align-items-center">
-                    <label for="cfg-enable-for" class="col-sm-5 col-form-label">Enable for:</label>
+                    <label for="cfg-enable-for" class="col-sm-5 col-form-label">Enable for (seconds):</label>
                     <div class="col-sm-7">
                         <input type="number" id="cfg-enable-for" class="form-control" min="0">
                     </div>
@@ -102,59 +102,62 @@
                 </div>
             </form>
 
-            <ul class="nav nav-tabs" id="logs-tabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="tab-logs-btn" data-bs-toggle="tab"
-                            data-bs-target="#tab-logs" type="button" role="tab">Logs</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="tab-error-logs-btn" data-bs-toggle="tab"
-                            data-bs-target="#tab-error-logs" type="button" role="tab">Error Logs</button>
-                </li>
-            </ul>
+            <span sec:authorize="hasAuthority('VIEW_LOGS')">
+                <ul class="nav nav-tabs" id="logs-tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="tab-logs-btn" data-bs-toggle="tab"
+                                data-bs-target="#tab-logs" type="button" role="tab">Logs</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tab-error-logs-btn" data-bs-toggle="tab"
+                                data-bs-target="#tab-error-logs" type="button" role="tab">Error Logs</button>
+                    </li>
+                </ul>
 
-            <div class="tab-content border border-top-0 rounded-bottom">
-                <div class="tab-pane fade show active machine-logs-pane" id="tab-logs" role="tabpanel">
-                    <table class="table table-borderless mb-0">
-                        <thead class="table-dark" style="position: sticky; top: 0; z-index: 1;">
-                            <tr>
-                                <th>Machine</th>
-                                <th>Date</th>
-                                <th>Type</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="logs-tbody">
-                            <tr><td colspan="4" class="text-center text-muted py-3">Loading...</td></tr>
-                        </tbody>
-                    </table>
+                <div class="tab-content border border-top-0 rounded-bottom">
+                    <div class="tab-pane fade show active machine-logs-pane" id="tab-logs" role="tabpanel">
+                        <table class="table table-borderless mb-0">
+                            <thead class="table-dark" style="position: sticky; top: 0; z-index: 1;">
+                                <tr>
+                                    <th>Machine</th>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="logs-tbody">
+                                <tr><td colspan="4" class="text-center text-muted py-3">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="tab-pane fade machine-logs-pane" id="tab-error-logs" role="tabpanel">
+                        <table class="table table-borderless mb-0">
+                            <colgroup>
+                                <col style="width: 22%">
+                                <col style="width: 22%">
+                                <col style="width: 56%">
+                            </colgroup>
+                            <thead class="table-dark" style="position: sticky; top: 0; z-index: 1;">
+                                <tr>
+                                    <th>Receive Date</th>
+                                    <th>Creation Date</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="error-logs-tbody">
+                                <tr><td colspan="3" class="text-center text-muted py-3">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="tab-pane fade machine-logs-pane" id="tab-error-logs" role="tabpanel">
-                    <table class="table table-borderless mb-0">
-                        <colgroup>
-                            <col style="width: 22%">
-                            <col style="width: 22%">
-                            <col style="width: 56%">
-                        </colgroup>
-                        <thead class="table-dark" style="position: sticky; top: 0; z-index: 1;">
-                            <tr>
-                                <th>Receive Date</th>
-                                <th>Creation Date</th>
-                                <th>Details</th>
-                            </tr>
-                        </thead>
-                        <tbody id="error-logs-tbody">
-                            <tr><td colspan="3" class="text-center text-muted py-3">Loading...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            </span>
         </div>
     </div>
 
 </main>
 
 <script th:inline="javascript">window.MACHINE_ID = /*[[${machineId}]]*/ '';</script>
+<script th:src="@{/js/public/utils.js}"></script>
 <script th:src="@{/js/private/machines_detail.js}"></script>
 </body>
 </html>

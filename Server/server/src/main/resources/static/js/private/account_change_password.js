@@ -1,17 +1,14 @@
-function showAlert(msg, type) {
-    document.getElementById('alert-container').innerHTML =
-        `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
-            ${msg}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>`;
-}
-
 document.getElementById('change-password-form').addEventListener('submit', function (e) {
     e.preventDefault();
     const btn = document.getElementById('submit-btn');
 
     const newPassword = document.getElementById('newPassword').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
+
+    if (!isValidPassword(newPassword)) {
+        showAlert(PASSWORD_REQUIREMENTS, 'danger');
+        return;
+    }
 
     if (newPassword !== confirmPassword) {
         showAlert('New passwords do not match.', 'danger');

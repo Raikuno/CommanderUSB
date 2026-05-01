@@ -29,7 +29,7 @@
         </div>
         <div class="mb-3">
             <label for="password" class="form-label">Password</label>
-            <input type="password" class="form-control" id="password" required>
+            <input type="password" class="form-control" id="password" required minlength="8" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}" title="At least 8 characters, including an uppercase letter, a lowercase letter and a digit">
         </div>
         <div class="mb-4">
             <label for="role" class="form-label">Role <span class="text-muted">(optional)</span></label>
@@ -44,6 +44,7 @@
     </form>
 
 </main>
+<script th:src="@{/js/public/utils.js}"></script>
 <script th:src="@{/js/private/users_new.js}"></script>
 </body>
 </html>

@@ -8,17 +8,17 @@ form.addEventListener('submit', async function(e){
     const email = formData.get('email');
     const password = formData.get('password');
 
-    if(email === "" || !new RegExp(/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{1,}$/).test(email)){
-        email.classList.add('is-invalid');
-        email.style.borderColor = 'red';
+    if(!isValidEmail(email)){
+        document.getElementById('email').classList.add('is-invalid');
+        alert(EMAIL_REQUIREMENTS);
+        submitBtn.disabled = false;
         return;
     }
 
     if(password === ""){
-        password.classList.add('is-invalid');
-        password.style.borderColor = 'red';
+        document.getElementById('password').classList.add('is-invalid');
+        submitBtn.disabled = false;
         return;
-
     }
 
     const payload = {};

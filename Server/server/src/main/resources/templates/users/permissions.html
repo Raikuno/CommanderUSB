@@ -19,8 +19,8 @@
     </div>
 
     <div class="mb-4">
-        <a th:href="@{/users}" class="btn btn-outline-secondary me-2">Users</a>
-        <a th:href="@{/users/roles}" class="btn btn-outline-secondary">Roles</a>
+        <a th:href="@{/users}" class="btn btn-outline-secondary me-2" sec:authorize="hasAuthority('USER_MANAGEMENT')">Users</a>
+        <a th:href="@{/users/roles}" class="btn btn-outline-secondary" sec:authorize="hasAuthority('MANAGE_ROLES')">Roles</a>
     </div>
 
     <p class="text-muted">Permissions are defined by the system and cannot be created or modified here.</p>
@@ -39,6 +39,7 @@
     </table>
 
 </main>
+<script th:src="@{/js/public/utils.js}"></script>
 <script th:src="@{/js/private/permissions_index.js}"></script>
 </body>
 </html>

@@ -9,4 +9,7 @@ public interface IJwtService {
     public String getEmailFromToken(String token);
     public boolean validateToken(String token);
     public boolean isRefreshToken(String token);
+    public String getJtiFromToken(String token);
+    public long getRefreshTokenSeconds();
+    public long getAccessTokenSeconds();
 }

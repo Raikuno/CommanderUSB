@@ -8,31 +8,7 @@ const LOG_TYPES = {
     1007: { label: 'Application Error',       cssClass: 'log-critical' }
 };
 
-function showAlert(msg, type) {
-    document.getElementById('alert-container').innerHTML =
-        `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
-            ${msg}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>`;
-}
-
-function escapeHtml(str) {
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-}
-
-function formatDate(date) {
-    if (!date) return '—';
-    if (Array.isArray(date)) {
-        const [y, mo, d, h, m, s] = date;
-        return `${y}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')} `
-             + `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s||0).padStart(2,'0')}`;
-    }
-    return new Date(date).toLocaleString();
-}
+const canRevise = document.getElementById('mark-revised-btn') !== null;
 
 function renderLogs(logs) {
     const tbody = document.getElementById('logs-tbody');
@@ -54,22 +30,23 @@ function renderLogs(logs) {
             <td>
                 <a href="/logs/${log.id}" class="btn btn-sm btn-outline-primary">Details</a>
             </td>
-            <td>
-                <input type="checkbox" class="log-checkbox" value="${log.id}">
-            </td>
+            <td>${canRevise ? `<input type="checkbox" class="log-checkbox" value="${log.id}">` : ''}</td>
         </tr>`;
     }).join('');
 
-    document.querySelectorAll('.log-checkbox').forEach(cb =>
-        cb.addEventListener('change', updateSelectAll)
-    );
+    if (canRevise) {
+        document.querySelectorAll('.log-checkbox').forEach(cb =>
+            cb.addEventListener('change', updateSelectAll)
+        );
+    }
 }
 
 function updateSelectAll() {
-    const all  = document.querySelectorAll('.log-checkbox');
+    const all = document.querySelectorAll('.log-checkbox');
     const checked = document.querySelectorAll('.log-checkbox:checked');
-    document.getElementById('select-all').indeterminate = checked.length > 0 && checked.length < all.length;
-    document.getElementById('select-all').checked = all.length > 0 && checked.length === all.length;
+    const selectAll = document.getElementById('select-all');
+    selectAll.indeterminate = checked.length > 0 && checked.length < all.length;
+    selectAll.checked = all.length > 0 && checked.length === all.length;
 }
 
 function loadLogs() {
@@ -79,40 +56,49 @@ function loadLogs() {
         .catch(() => showAlert('Failed to load logs.', 'danger'));
 }
 
-document.getElementById('select-all').addEventListener('change', function () {
-    document.querySelectorAll('.log-checkbox').forEach(cb => cb.checked = this.checked);
-});
+const selectAll = document.getElementById('select-all');
+if (selectAll) {
+    selectAll.addEventListener('change', function () {
+        document.querySelectorAll('.log-checkbox').forEach(cb => cb.checked = this.checked);
+    });
+}
 
-document.getElementById('mark-revised-btn').addEventListener('click', function () {
-    const selected = [...document.querySelectorAll('.log-checkbox:checked')];
-    if (selected.length === 0) {
-        showAlert('Select at least one log to mark as revised.', 'warning');
-        return;
-    }
-    document.getElementById('revise-count').textContent = selected.length;
-    new bootstrap.Modal(document.getElementById('reviseModal')).show();
-});
+const markRevisedBtn = document.getElementById('mark-revised-btn');
+if (markRevisedBtn) {
+    markRevisedBtn.addEventListener('click', function () {
+        const selected = [...document.querySelectorAll('.log-checkbox:checked')];
+        if (selected.length === 0) {
+            showAlert('Select at least one log to mark as revised.', 'warning');
+            return;
+        }
+        document.getElementById('revise-count').textContent = selected.length;
+        new bootstrap.Modal(document.getElementById('reviseModal')).show();
+    });
+}
 
-document.getElementById('confirm-revise-btn').addEventListener('click', function () {
-    const btn = this;
-    btn.disabled = true;
-    const ids = [...document.querySelectorAll('.log-checkbox:checked')].map(cb => parseInt(cb.value));
+const confirmReviseBtn = document.getElementById('confirm-revise-btn');
+if (confirmReviseBtn) {
+    confirmReviseBtn.addEventListener('click', function () {
+        const btn = this;
+        btn.disabled = true;
+        const ids = [...document.querySelectorAll('.log-checkbox:checked')].map(cb => parseInt(cb.value));
 
-    fetch('/api/logs/revise-bulk', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(ids)
-    })
-    .then(res => res.ok ? res : res.text().then(t => Promise.reject(t)))
-    .then(() => {
-        bootstrap.Modal.getInstance(document.getElementById('reviseModal')).hide();
-        loadLogs();
-    })
-    .catch(err => {
-        bootstrap.Modal.getInstance(document.getElementById('reviseModal')).hide();
-        showAlert(err || 'Failed to mark logs as revised.', 'danger');
-    })
-    .finally(() => { btn.disabled = false; });
-});
+        fetch('/api/logs/revise-bulk', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(ids)
+        })
+        .then(res => res.ok ? res : res.text().then(t => Promise.reject(t)))
+        .then(() => {
+            bootstrap.Modal.getInstance(document.getElementById('reviseModal')).hide();
+            loadLogs();
+        })
+        .catch(err => {
+            bootstrap.Modal.getInstance(document.getElementById('reviseModal')).hide();
+            showAlert(err || 'Failed to mark logs as revised.', 'danger');
+        })
+        .finally(() => { btn.disabled = false; });
+    });
+}
 
 loadLogs();

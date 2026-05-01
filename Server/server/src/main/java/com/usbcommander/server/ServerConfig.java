@@ -20,6 +20,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.usbcommander.server.security.JwtAuthenticationFilter;
 import com.usbcommander.server.service.IJwtService;
+import com.usbcommander.server.service.ISessionService;
+import com.usbcommander.server.service.IUserService;
 
 @Configuration
 @PropertySource("classpath:usbcommander.properties")
@@ -31,8 +33,9 @@ public class ServerConfig {
     }
     
     @Bean
-    JwtAuthenticationFilter jwtAuthenticationFilter(IJwtService jwtUtils, UserDetailsService userDetailsService) {
-        return new JwtAuthenticationFilter(jwtUtils, userDetailsService);
+    JwtAuthenticationFilter jwtAuthenticationFilter(IJwtService jwtUtils, UserDetailsService userDetailsService, 
+        ISessionService sessionService, IUserService userService) {
+        return new JwtAuthenticationFilter(jwtUtils, userDetailsService, sessionService, userService);
     }
 
     @Bean
@@ -60,14 +63,17 @@ public class ServerConfig {
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/permissions").hasAuthority(AppConst.Authorities.MANAGE_ROLES)
-                .requestMatchers("/api/roles").hasAuthority(AppConst.Authorities.MANAGE_ROLES)
-                .requestMatchers("/api/roles/**").hasAuthority(AppConst.Authorities.MANAGE_ROLES)
+                .requestMatchers("/api/users/permissions").hasAuthority(AppConst.Authorities.MANAGE_ROLES)
+                .requestMatchers("/api/users/roles").hasAuthority(AppConst.Authorities.MANAGE_ROLES)
+                .requestMatchers("/api/users/roles/**").hasAuthority(AppConst.Authorities.MANAGE_ROLES)
                 .requestMatchers("/api/users").hasAuthority(AppConst.Authorities.USER_MANAGEMENT)
                 .requestMatchers("/api/users/**").hasAuthority(AppConst.Authorities.USER_MANAGEMENT)
+                .requestMatchers("/api/machine/getUnrevisedMachines").hasAuthority(AppConst.Authorities.VIEW_LOGS)
+                .requestMatchers("/api/logs/**").hasAuthority(AppConst.Authorities.VIEW_LOGS)
+                .requestMatchers("/**/error-logs").hasAuthority(AppConst.Authorities.VIEW_LOGS)
                 .requestMatchers("/**/revise").hasAuthority(AppConst.Authorities.SOLVE_LOGS)
                 .requestMatchers("/api/logs/revise-bulk").hasAuthority(AppConst.Authorities.SOLVE_LOGS)
-                .requestMatchers("/api/logs/**").hasAuthority(AppConst.Authorities.VIEW_LOGS)
+                .requestMatchers("/api/machine/*").hasAuthority(AppConst.Authorities.MACHINE_MANAGEMENT)
                 .anyRequest().authenticated()
             )
             .exceptionHandling(ex -> ex.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
@@ -96,7 +102,8 @@ public class ServerConfig {
                 .requestMatchers("/users/roles/**").hasAuthority(AppConst.Authorities.MANAGE_ROLES)
                 .requestMatchers("/users/permissions").hasAuthority(AppConst.Authorities.MANAGE_ROLES)
                 .requestMatchers("/users/**").hasAuthority(AppConst.Authorities.USER_MANAGEMENT)
-                .requestMatchers("/log/**").hasAuthority(AppConst.Authorities.VIEW_LOGS)
+                .requestMatchers("/logs/**").hasAuthority(AppConst.Authorities.VIEW_LOGS)
+                .requestMatchers("/machines/**").hasAuthority(AppConst.Authorities.MACHINE_MANAGEMENT)
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form

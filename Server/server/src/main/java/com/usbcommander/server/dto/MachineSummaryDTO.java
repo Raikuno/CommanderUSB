@@ -8,7 +8,7 @@ public class MachineSummaryDTO {
     private String name;
     private String ip;
     private Boolean disable;
-    private Integer logFrecuency;
+    private Long logFrecuency;
     private LocalDateTime registeredDate;
     private String description;
     private boolean connected;
@@ -26,8 +26,8 @@ public class MachineSummaryDTO {
     public Boolean getDisable() { return disable; }
     public void setDisable(Boolean disable) { this.disable = disable; }
 
-    public Integer getLogFrecuency() { return logFrecuency; }
-    public void setLogFrecuency(Integer logFrecuency) { this.logFrecuency = logFrecuency; }
+    public Long getLogFrecuency() { return logFrecuency; }
+    public void setLogFrecuency(Long logFrecuency) { this.logFrecuency = logFrecuency; }
 
     public LocalDateTime getRegisteredDate() { return registeredDate; }
     public void setRegisteredDate(LocalDateTime registeredDate) { this.registeredDate = registeredDate; }

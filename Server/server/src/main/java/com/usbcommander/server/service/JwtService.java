@@ -2,6 +2,7 @@ package com.usbcommander.server.service;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.UUID;
 
 import javax.crypto.SecretKey;
 
@@ -22,9 +23,9 @@ public class JwtService implements IJwtService{
     private final long accessTokenSeconds;
     private final long refreshTokenSeconds;
 
-    public JwtService(@Value("${jwt.secret:replace_with_secure_random_secret}") String secret,
-            @Value("${jwt.access-token-expiration-seconds:900}") long accessTokenSeconds,
-            @Value("${jwt.refresh-token-expiration-seconds:604800}") long refreshTokenSeconds) {
+    public JwtService(@Value("${jwt.secret}") String secret,
+            @Value("${jwt.access-token-expiration-seconds}") long accessTokenSeconds,
+            @Value("${jwt.refresh-token-expiration-seconds}") long refreshTokenSeconds) {
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.accessTokenSeconds = accessTokenSeconds;
         this.refreshTokenSeconds = refreshTokenSeconds;
@@ -48,11 +49,17 @@ public class JwtService implements IJwtService{
         Date exp = new Date(now.getTime() + refreshTokenSeconds * 1000L);
         return Jwts.builder()
                 .setSubject(user.getEmail())
+                .setId(UUID.randomUUID().toString())
                 .claim("type", "refresh")
                 .setIssuedAt(now)
                 .setExpiration(exp)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    public String getJtiFromToken(String token) {
+        Claims claims = parseClaims(token);
+        return claims == null ? null : claims.getId();
     }
 
     private Claims parseClaims(String token) {

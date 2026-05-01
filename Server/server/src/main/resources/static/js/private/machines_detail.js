@@ -8,32 +8,6 @@ const LOG_TYPES = {
     1007: { label: 'Critical Error',          cssClass: 'log-critical' }
 };
 
-function showAlert(msg, type) {
-    document.getElementById('alert-container').innerHTML =
-        `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
-            ${msg}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>`;
-}
-
-function escapeHtml(str) {
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-}
-
-function formatDate(date) {
-    if (!date) return '—';
-    if (Array.isArray(date)) {
-        const [y, mo, d, h, m, s] = date;
-        return `${y}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')} `
-             + `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s||0).padStart(2,'0')}`;
-    }
-    return new Date(date).toLocaleString();
-}
-
 function formatFrecuency(ms) {
     if (ms == null) return '—';
     return `${ms} ms`;
