@@ -1,0 +1,57 @@
+services:
+  db:
+    image: mariadb:latest
+    container_name: commanderdb
+    restart: always
+    expose:
+      - "3306"
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DATABASE_ROOT_PASSWORD}
+      MARIADB_DATABASE: usbcommanderdb
+      MARIADB_USER: ${MARIADB_USER}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+    volumes:
+      - ./database-files:/var/lib/mysql
+      - ./init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: ./application
+      dockerfile: ../docker_image/Dockerfile
+    container_name: commanderapp
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - "${SERVER_PORT}"
+    ports:
+      - "${SOCKET_PORT}:${SOCKET_PORT}"
+    environment:
+      DATABASE_URL: jdbc:mariadb://db:3306/usbcommanderdb
+      MARIADB_USER: ${MARIADB_USER}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+      SOCKET_PORT: ${SOCKET_PORT}
+      JWT_SECRET: ${JWT_SECRET}
+      REFRESH_TOKEN_LIFE: ${REFRESH_TOKEN_LIFE}
+      ACCESS_TOKEN_LIFE: ${ACCESS_TOKEN_LIFE}
+      LOG_ROUTE: ${LOG_ROUTE}
+      COOKIE_SECURE: ${COOKIE_SECURE:-true}
+    volumes:
+    - ./server_logs:${LOG_ROUTE}
+
+  nginx:
+    image: nginx:alpine
+    container_name: commandernginx
+    restart: always
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro

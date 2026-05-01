@@ -1,5 +1,6 @@
 package com.usbcommander.server;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -33,9 +34,10 @@ public class ServerConfig {
     }
     
     @Bean
-    JwtAuthenticationFilter jwtAuthenticationFilter(IJwtService jwtUtils, UserDetailsService userDetailsService, 
-        ISessionService sessionService, IUserService userService) {
-        return new JwtAuthenticationFilter(jwtUtils, userDetailsService, sessionService, userService);
+    JwtAuthenticationFilter jwtAuthenticationFilter(IJwtService jwtUtils, UserDetailsService userDetailsService,
+        ISessionService sessionService, IUserService userService,
+        @Value("${app.cookies.secure}") boolean cookieSecure) {
+        return new JwtAuthenticationFilter(jwtUtils, userDetailsService, sessionService, userService, cookieSecure);
     }
 
     @Bean
