@@ -27,15 +27,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
     private final ISessionService sessionService;
     private final IUserService userService;
+    private final boolean cookieSecure;
 
 
-    public JwtAuthenticationFilter(IJwtService jwtUtils, 
+    public JwtAuthenticationFilter(IJwtService jwtUtils,
         UserDetailsService userDetailsService, ISessionService sessionService,
-        IUserService userService) {
+        IUserService userService, boolean cookieSecure) {
         this.jwtService = jwtUtils;
         this.userDetailsService = userDetailsService;
         this.sessionService = sessionService;
         this.userService = userService;
+        this.cookieSecure = cookieSecure;
     }
 
     @Override
@@ -75,7 +77,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     ResponseCookie.from(AppConst.ACCESS_TOKEN_NAME, token)
                     .httpOnly(true)
                     .path("/")
-                    .secure(true)
+                    .secure(cookieSecure)
                     .sameSite("Strict")
                     .maxAge(jwtService.getAccessTokenSeconds())
                     .build().toString()

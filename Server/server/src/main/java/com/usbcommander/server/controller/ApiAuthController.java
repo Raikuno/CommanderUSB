@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -44,6 +45,8 @@ public class ApiAuthController {
     private IFirstStartService loginService;
     @Autowired
     private ISessionService sessionService;
+    @Value("${app.cookies.secure}")
+    private boolean cookieSecure;
 
     @PostMapping("/firstuser")
     public ResponseEntity<String> getMethodName(@RequestBody Map<String, String> payload) {
@@ -96,14 +99,14 @@ public class ApiAuthController {
             ResponseCookie refreshCookie = ResponseCookie.from(AppConst.REFRESH_TOKEN_NAME, refreshToken)
             .httpOnly(true)
             .path("/")
-            .secure(true)
+            .secure(cookieSecure)
             .sameSite("Strict")
             .maxAge(jwtService.getRefreshTokenSeconds())
             .build();
             ResponseCookie authCookie = ResponseCookie.from(AppConst.ACCESS_TOKEN_NAME, accessToken)
                     .httpOnly(true)
                     .path("/")
-                    .secure(true)
+                    .secure(cookieSecure)
                     .sameSite("Strict")
                     .maxAge(jwtService.getAccessTokenSeconds())
                     .build();
@@ -155,7 +158,7 @@ public class ApiAuthController {
         ResponseCookie authCookie = ResponseCookie.from(AppConst.ACCESS_TOKEN_NAME, newAccessToken)
                 .httpOnly(true)
                 .path("/")
-                .secure(true)
+                .secure(cookieSecure)
                 .sameSite("Strict")
                 .maxAge(jwtService.getAccessTokenSeconds())
                 .build();
@@ -180,14 +183,14 @@ public class ApiAuthController {
         ResponseCookie authCookie = ResponseCookie.from(AppConst.ACCESS_TOKEN_NAME, "")
                 .httpOnly(true)
                 .path("/")
-                .secure(true)
+                .secure(cookieSecure)
                 .sameSite("Strict")
                 .maxAge(0)
                 .build();
         ResponseCookie refreshCookie = ResponseCookie.from(AppConst.REFRESH_TOKEN_NAME, "")
                 .httpOnly(true)
                 .path("/")
-                .secure(true)
+                .secure(cookieSecure)
                 .sameSite("Strict")
                 .maxAge(0)
                 .build();
