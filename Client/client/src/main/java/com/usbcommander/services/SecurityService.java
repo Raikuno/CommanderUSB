@@ -19,18 +19,49 @@ import com.usbcommander.managers.contract.IStatusManager;
 import com.usbcommander.managers.contract.IUsbMemoryManager;
 import com.usbcommander.services.contract.CommanderService;
 
+/**
+ * Servicio encargado de controlar y asegurar las funciones de seguridad que controlan el uso de memorias usb y las correctas modificaciones en los archivos de configuración de la aplicación
+ * Por el momento, su implementación es específica de Windows
+ */
 public class SecurityService extends CommanderService{
 
+    /**
+     * Instancia del servicio
+     */
     private static SecurityService instance;
 
+    /**
+     * Objeto Thread que almacena las instrucciones a ejecutar en el caso de que se produzca una modificación en el registro de windows
+     */
     private Thread usbStorListener;
+    /**
+     * Objeto Thread que almacena las instrucciones a ejecutar en el caso de que se produzca una modificación en los archivos de configuración de la aplicación
+     */
     private Thread appConfigListener;
+    /**
+     * Instancia de IUsbMemoryManager para controlar el estado de las memorias usb con respecto a la máquina
+     */
     private IUsbMemoryManager usbMemoryManager;
+    /**
+     * Instancia de IStatusManager para la creación de registros en el caso de que se detecten modificaciones no permitidas en la máquina
+     */
     private IStatusManager statusManager;
+    /**
+     * Instancia de IMachineConfig para obtener la configuración esperada, asi como modificarla
+     */
     private IMachineConfig machineConfig;
+    /**
+     * Variable que representa el tiempo de acceso permitido para el uso de memorias usb
+     */
     private long grantedFor;
+    /**
+     * Objeto Thread que almacena las instrucciones a ejecutar al momento de posibilitar el uso de memorias usb
+     */
     private Thread grantedAccess;
 
+    /**
+     * Constructor encargado de inicializar las propiedades del objeto
+     */
     private SecurityService(){
         this.usbMemoryManager = UsbMemoryManager.getInstance();
         this.statusManager = StatusManager.getInstance();
@@ -67,9 +98,20 @@ public class SecurityService extends CommanderService{
     }
 
     /**
-     * Compares the current USBSTOR\Start value with the expected value derived from the in-memory machineConfig state.
-     * @return true if the registry matches memory (an internal/expected change), false on mismatch (tampering)
+     * Método estático usado para inicializar y obtener la instancia de este servicio
+     * @return La instancia inicializada del Servicio
      */
+    public static SecurityService getInstance(){
+        if(instance == null){
+            instance = new SecurityService();
+        }
+        return instance;
+    }
+
+    /**
+     * Compara el estado actual del permiso de uso de las memorias usb en el registro de windows con el valor de configuración de la aplicación almacenado en memoria
+     * @return True si el registro coincide con el valor de configuración, y falso en el caso contrario
+    */
     private boolean usbStorMatchesMemory(){
         try{
             int expected = machineConfig.isUsbEnable()
@@ -82,8 +124,8 @@ public class SecurityService extends CommanderService{
     }
 
     /**
-     * Compares the current config registry values with the in-memory machineConfig state.
-     * @return true if every persisted field matches memory, false otherwise
+     * Compara los valores de configuración almacenados en memoria con los almacenados en la máquina
+     * @return True si los valores coinciden, false en el caso opuesto
      */
     private boolean configMatchesMemory(){
         try{
@@ -123,18 +165,10 @@ public class SecurityService extends CommanderService{
         }
     }
 
-    public static SecurityService getInstance(){
-        if(instance == null){
-            instance = new SecurityService();
-        }
-        return instance;
-    }
-
     /**
-     * This method enables the use of usb storage units during the specified duration
-     * @param time The time during the usb storage units will be able to be mounted
-     * @return  A boolean representing if the action was succesfull or not. This will only be returned after the access has been closed
-     * @throws ServiceDisabledException 
+     * Este método habilita la conexión de memorias usb en la máquina durante el tiempo establecido
+     * @param time El tiempo durante el cuál será posible conectar memoras usb en la máquina
+     * @throws ServiceDisabledException En el caso de que al momento de llamarse el método, este servicio no este activo
      */
     public void openAccess(long time) throws ServiceDisabledException{
         if(!running){
@@ -177,9 +211,9 @@ public class SecurityService extends CommanderService{
     }
 
     /**
-     * This method forces to close the access to usb storage units
-     * @return A boolean representing if the operation was succesful
-     * @throws ServiceDisabledException 
+     * Este método deshabilita la posibilidad de conectar memorias usb y eyecta las actualmente montadas
+     * @return Un booleano representando si la operación tuvo exito o no
+     * @throws ServiceDisabledException En el caso de que al momento de llamarse el método, este servicio no este activo
      */
     public void forceClose() throws ServiceDisabledException{
         if(!running){
@@ -216,12 +250,11 @@ public class SecurityService extends CommanderService{
     }
 
     /**
-     * Returns a thread object with a function that will set an event listener waiting for changes to be made on the value of the entry defined by the parameter route, to then perform the function defined
-     * @param route The route to the windows registry entry
-     * @param onChannge The function to be executed when the listener detect changes on the registry
-     * @param onCatch The function to be executed in case tan error is encountered when creating the lsitener
-     * @return A Thread object
-     * @throws Win32Exception If the application can't access the registry values
+     * Método empleador para facilitar la creación de Threads encargados de supervisar entradas en el registro de windows
+     * @param route La ruta del valor del registro en la cuál se va a crear el hilo de supervisión
+     * @param onChannge La función a ejecutar cuando se detectan cambios en el registro
+     * @param onCatch La función a ejecutar si se lanza una excepción al momento de lanzar el hilo
+     * @return El hilo de supervisión
      */
     private Thread setListenerOn(String route, Runnable onChannge, Consumer<Win32Exception> onCatch){
         return new Thread(()->{
@@ -264,6 +297,11 @@ public class SecurityService extends CommanderService{
         });
     }
 
+    /**
+     * Método usado para iniciar la ejecución de los Thread creados en el Servicio para la supervisión de los campos en el registro de windows
+     * @param listener El Thread de supervisión a iniciar
+     * @return Un booleano indicando si la operación tuvo exito o no
+     */
     private boolean startListener(Thread listener){
         try{
             listener.setDaemon(true);

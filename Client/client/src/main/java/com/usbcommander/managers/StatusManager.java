@@ -23,12 +23,30 @@ import com.usbcommander.enums.LogType;
 import com.usbcommander.managers.contract.IStatusManager;
 import com.usbcommander.managers.contract.IUsbMemoryManager;
 
+/**
+ * Implementación de IStatusManager para funciionarr en un entorno de windows haciendo uso del registro de windows y windows event viewer
+ */
 public class StatusManager extends IStatusManager{
+    /**
+     * Instancia de IUsbMemoryManager usada para obtener información del estado de la máquina
+     */
     private IUsbMemoryManager usbMemoryManager;
+    /**
+     * Instancia de IMachineConfig para comparar el estado esperado de la máquina
+     */
     private IMachineConfig machineConfig;
+    /**
+     * Instancia de Jackson para serializar objetos de registro como json
+     */
     private ObjectMapper mapper;
+    /**
+     * Instancia de Advapi32 para interactuar con el registro de windows y windows event viewer
+     */
     private Advapi32 advapi32;
 
+    /**
+     * Constructor de la clase en el que se inicializan las propiedades del objeto
+     */
     private StatusManager(){
         usbMemoryManager = UsbMemoryManager.getInstance();
         machineConfig = MachineConfig.getInstance();
@@ -36,6 +54,10 @@ public class StatusManager extends IStatusManager{
         mapper = new ObjectMapper().registerModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
+    /**
+     * Método estático que construye una instancia de IStatusManager con la implementación definida en esta clase.
+     * @return La instancia almacenada en la clase abstracta, inicializada como objeto de esta clase
+     */
     public static IStatusManager getInstance(){
         if(instance == null){
             instance = new StatusManager();
@@ -137,6 +159,12 @@ public class StatusManager extends IStatusManager{
         return log;
     }
 
+    /**
+     * Método usado para facilitar la escritura de los objetos de registro en windows event viewer.
+     * @param type El tipo de registro de windows a almmacenar
+     * @param code El código de registro asignado por la aplicación
+     * @param message El mensaje a almacenar en registro de windows event viewer
+     */
     private void writeEventLog(int type, int code, String message){
         var handle = advapi32.RegisterEventSource(
             null,        

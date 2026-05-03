@@ -4,13 +4,31 @@ import com.sun.jna.platform.win32.Win32Exception;
 import com.usbcommander.AppConst;
 import com.usbcommander.config.contract.IMachineConfig;
 
-
+/**
+ * Implementación de IMachineConfig para máquinas con windows como sistema operativo
+ */
 public class MachineConfig extends IMachineConfig{
+    /**
+     * Valor que almacena si debería ser posible montar unidades de memoria usb extraibles en la máquina
+     */
     private boolean usbEnable;
+    /**
+     * Valor que almacena la frecuencia con la que se envían los registros automáticos
+     */
     private long logFrecuency;
+    /**
+     * Valor que almacena la ip del servidor
+     */
     private String ip;
+    /**
+     * Valor que almacena el puerto del servidor
+     */
     private Integer port;
     
+    /**
+     * Constructor usado cuando no se encuentra configuración previa. 
+     * Almacena los valores por defecto de configuración de la aplicación en el registro de windows
+     */
     private MachineConfig(){
         this.usbEnable = false;
         this.logFrecuency = 300000;
@@ -24,11 +42,21 @@ public class MachineConfig extends IMachineConfig{
         saveConfig();
     }
 
+    /**
+     * Constructor usado cuándo se encuentran valores almacenados de configuración de la aplicación en el registro de windows
+     * @param usbEnable Si se deberían poder (true) o no (false) poder montar memorias usb
+     * @param logFrecuency La frecuencia en milesimas de segundo con la que se envían los registros automáticos
+     */
     private MachineConfig(boolean usbEnable, long logFrecuency){
         this.usbEnable = usbEnable;
         this.logFrecuency = logFrecuency;
     }
 
+    /**
+     * Método estático que construye una instancia de IMachineConfig con la implementación definida en esta clase.
+     * En función de si encuentra o no los valores necesarios en el registro de winndows, hará uso de un constructor u otro.
+     * @return La instancia almacenada en la clase abstracta, inicializada como objeto de esta clase
+     */
     public static IMachineConfig getInstance(){
         if(instance == null){
             try{

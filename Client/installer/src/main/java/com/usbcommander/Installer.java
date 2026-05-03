@@ -54,6 +54,11 @@ public class Installer {
 
     public void registryDeletion(){
         Advapi32Util.registryDeleteKey(MAIN_LOCATION, CONFIG_LOCATION);
+        Advapi32Util.registrySetIntValue(
+            WinReg.HKEY_LOCAL_MACHINE, 
+            "SYSTEM\\CurrentControlSet\\Services\\USBSTOR", 
+            "Start", 
+            3);
         System.out.println("Registry configuration deleted");
     }
 
@@ -106,7 +111,8 @@ public class Installer {
 
     public void deleteApplication() {
         try {
-            File folder = new File(BINARY_INSTALLED_LOCATION);
+            Path path = Paths.get(BINARY_INSTALLED_LOCATION);
+            File folder = path.toFile();
             deleteFiles(folder);
             folder.delete();
             System.out.println("Aplication delted");
