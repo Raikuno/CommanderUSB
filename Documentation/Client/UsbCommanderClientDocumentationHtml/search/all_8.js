@@ -1,0 +1,10 @@
+var searchData=
+[
+  ['listenerthread_0',['listenerThread',['../classcom_1_1usbcommander_1_1services_1_1ServerConnectionService.html#a989ecc2c2bb0b7d69bef91bd6dab35a2',1,'com::usbcommander::services::ServerConnectionService']]],
+  ['log_5fentry_1',['LOG_ENTRY',['../classcom_1_1usbcommander_1_1AppConst_1_1ConfigReferences.html#a8185754316640853052af65aec19367e',1,'com::usbcommander::AppConst::ConfigReferences']]],
+  ['log_5fgeneration_5ferror_2',['LOG_GENERATION_ERROR',['../classcom_1_1usbcommander_1_1AppConst_1_1ErrorMessages.html#a3f66fb44e078a1f647258ceab7695d4f',1,'com::usbcommander::AppConst::ErrorMessages']]],
+  ['logdto_3',['LogDTO',['../classcom_1_1usbcommander_1_1dto_1_1LogDTO.html',1,'com.usbcommander.dto.LogDTO'],['../classcom_1_1usbcommander_1_1dto_1_1LogDTO.html#a28027e83d0e88efb5fc44f9a9fc59357',1,'com.usbcommander.dto.LogDTO.LogDTO()'],['../classcom_1_1usbcommander_1_1dto_1_1LogDTO.html#a21a88bbd8e8dda04b96fdfc5a4dd453d',1,'com.usbcommander.dto.LogDTO.LogDTO(int usbValue, boolean usbAllowed, List&lt; Map&lt; String, String &gt; &gt; usbList, LocalDateTime creationDate, int code)'],['../classcom_1_1usbcommander_1_1dto_1_1LogDTO.html#a00484d435722de228963e0c8e20b6fa3',1,'com.usbcommander.dto.LogDTO.LogDTO(int code, String errorMessage, LocalDateTime creationDate)']]],
+  ['logfrecuency_4',['logFrecuency',['../classcom_1_1usbcommander_1_1config_1_1MachineConfig.html#a402c75213d25f06e80aa7843c8e86e38',1,'com::usbcommander::config::MachineConfig']]],
+  ['logservice_5',['LogService',['../classcom_1_1usbcommander_1_1services_1_1LogService.html',1,'com.usbcommander.services.LogService'],['../classcom_1_1usbcommander_1_1services_1_1LogService.html#a8b3446faadc1945bcbc1819d3aeb591b',1,'com.usbcommander.services.LogService.LogService()']]],
+  ['logtype_6',['LogType',['../enumcom_1_1usbcommander_1_1enums_1_1LogType.html',1,'com.usbcommander.enums.LogType'],['../enumcom_1_1usbcommander_1_1enums_1_1LogType.html#afe2300659c146c938e262022db7e97bf',1,'com.usbcommander.enums.LogType.LogType()']]]
+];
