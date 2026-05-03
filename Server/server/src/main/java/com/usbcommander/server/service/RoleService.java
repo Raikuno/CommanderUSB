@@ -11,9 +11,15 @@ import com.usbcommander.server.entity.Role;
 import com.usbcommander.server.repository.RoleRepository;
 
 @Service
+/**
+ * Implementación de la interfaz IRoleService
+ */
 public class RoleService implements IRoleService{
 
     @Autowired
+    /**
+     * Repositorio vinculado al servicio
+     */
     private RoleRepository repository;
 
     @Override

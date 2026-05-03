@@ -11,8 +11,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.usbcommander.server.entity.Permission;
 import com.usbcommander.server.entity.User;
 
+/**
+ * Implementación especifica de la aplicación de la clase UserDetails de spring para construir el sistema de autenticación
+ */
 public class CommanderUserDetails implements UserDetails {
 
+    /**
+     * Propiedad que almacena el usuario cuya sesión a sido iniciada
+     */
     private User user;
 
     public CommanderUserDetails(User user) {

@@ -30,6 +30,9 @@ import com.usbcommander.server.utils.Validations;
 
 @RestController
 @RequestMapping("/api/users")
+/**
+ * En esta clase se definen los endpoints dedicados a las acciones de administración de cuentas
+ */
 public class UserAdministrationApiController {
 
     @Autowired 
@@ -40,11 +43,22 @@ public class UserAdministrationApiController {
     private IPermissionService permissionService;
 
     @GetMapping({"", "/"})
+    /**
+     * Método a ejecutar cuándo se lleva a cabo una petición a /api/users.
+     * Devuelve la lista de todos los usuarios almacenados en la base de datos
+     * @return Una respuesta con una lista con todos los usuarios en la base de datos
+     */
     public ResponseEntity<List<User>> getAllUsers() {
         return ResponseEntity.ok(userService.getAll());
     }
 
     @PostMapping("/createUser")
+    /**
+     * Método a ejecutar cuándo se lleva a cabo una petición a /api/users/creatUser.
+     * Permite crear un usuario enviando sus credenciales mediante una petición post
+     * @param user La información de la petición con los datos del nuevo usuario
+     * @return Una respuesta en función de si se ha creado el usuario o si no se han podido validar los campos necesarios
+     */
     public ResponseEntity<?> createUser(@RequestBody Map<String, String> user) {
         if (user.get("name") == null || user.get("name").isBlank()
                 || user.get("email") == null || user.get("email").isBlank()
@@ -76,6 +90,12 @@ public class UserAdministrationApiController {
     }
 
     @GetMapping("/{id}")
+    /**
+     * Método a ejecutar cuándo se lleva a cabo una petición a /api/users/{id}. Siendo id la id de un usuario cuyos detalles desean verse
+     * Devuelve la información de un usuario almacenado en la base de datos en función del id enviado en la petición.
+     * @param id La id del usuario cuyos datos desean obtenerse
+     * @return Una respuesta en función de si se ha encontrado o no el usuario buscado
+     */
     public ResponseEntity<User> getUserById(@PathVariable String id) {
         try {
             return userService.getById(UUID.fromString(id))
@@ -87,6 +107,13 @@ public class UserAdministrationApiController {
     }
 
     @PutMapping("/{id}")
+    /**
+     * Método a ejecutar cuándo se lleva a cabo una petición put a /api/users/{id}. Siendo id la id de un usuario cuyos detalles desean actualizarse
+     * Permite actualizar la información del usuario buscado
+     * @param id La id del usuario cuyos datos desean actualizarse
+     * @param data Los datos nuevos a insertar en el usuario
+     * @return Una respuesta en función de si los campos son correctos y de si se ha podido llevar a cabo la operación correctamente
+     */
     public ResponseEntity<?> updateUser(@PathVariable String id, @RequestBody Map<String, String> data) {
         UUID uuid;
         try {
@@ -134,6 +161,12 @@ public class UserAdministrationApiController {
     }
 
     @PatchMapping("/users/{id}/disable")
+    /**
+     * Método a ejecutar cuándo se lleva a cabo una petición put a /api/users/{id}/disable. Siendo id la id de un usuario que quiera desactivarse
+     * Permite marcar un usuario como deshabilitado o habilitar un usuario deshabilitado
+     * @param id La id del usuario a deshabilitar/habilitar
+     * @return Una respuesta en función de si la operación se ha llevado a cabo correctamnete o no
+     */
     public ResponseEntity<?> toggleDisable(@PathVariable String id) {
         return userService.getById(UUID.fromString(id))
                 .map(user -> {
@@ -145,11 +178,22 @@ public class UserAdministrationApiController {
     }
 
     @GetMapping("/roles")
+    /**
+     * Método a ejecutar cuándo se lleva a cabo una petición a /api/users/roles.
+     * Permitee obtener todos los roles almacenados en la base de datos
+     * @return Una respuesta con una lista con todos los roles almacenados en la base de datos
+     */
     public ResponseEntity<List<Role>> getAllRoles() {
         return ResponseEntity.ok(roleService.getAll());
     }
 
     @GetMapping("/roles/{id}")
+    /**
+     * Método a ejecutar cuándo se lleva a cabo una petición a /api/users/roles/{id}, siendo {id} la id del rol cuyos detalles desean verse
+     * Permite obtener los datos de un rol en función de su id
+     * @param id La id del rol buscado
+     * @return Una respuesta en función de si se ha encontrado o no el id buscado
+     */
     public ResponseEntity<Role> getRoleById(@PathVariable String id) {
         return roleService.getById(UUID.fromString(id))
                 .map(ResponseEntity::ok)
@@ -157,6 +201,12 @@ public class UserAdministrationApiController {
     }
 
     @PostMapping("/roles")
+    /**
+     * Método a ejecutar cuándo se lleva a cabo una petición post a /api/users/roles/
+     * Permite crear un nuevo rol
+     * @param dto La información del nuevo rol
+     * @return Una respuesta en función de si la operación ha tenido exito o no
+     */
     public ResponseEntity<?> createRole(@RequestBody RoleFormDTO dto) {
         if (dto.getName() == null || dto.getName().isBlank()) {
             return ResponseEntity.badRequest().body("Role name is required");
@@ -172,6 +222,13 @@ public class UserAdministrationApiController {
     }
 
     @PutMapping("/roles/{id}")
+    /**
+     * Método a ejecutar cuándo se lleva a cabo una petición put a /api/users/roles/{id}, siendo {id} la id del rol cuyos detalles desean actualizarse
+     * Permite actualizar los datos de un rol en función de su id
+     * @param id La id del rol buscado
+     * @param dto Los datos actualizados del rol
+     * @return Una respuesta en función de si la operación a tenido exito o no
+     */
     public ResponseEntity<?> updateRole(@PathVariable String id, @RequestBody RoleFormDTO dto) {
         return roleService.getById(UUID.fromString(id))
                 .map(role -> {
@@ -191,10 +248,20 @@ public class UserAdministrationApiController {
     }
 
     @GetMapping("/permissions")
+    /**
+     * Método a ejecutar cuándo se lleva a cabo una petición a /api/users/permissions
+     * Permite obtener todos los permisos almacenados en la base de datos
+     * @return Una respuesta con una lista con todos los permisos encontrados en la base de datos
+     */
     public ResponseEntity<List<Permission>> getAllPermissions() {
         return ResponseEntity.ok(permissionService.getAll());
     }
 
+    /**
+     * Método utilizado para obtener una serie de permisos en función de una lista de ids
+     * @param ids Lista con los ids a buscar de los permisos
+     * @return Un set con todos loss permisos encontrados
+     */
     private Set<Permission> resolvePermissions(List<String> ids) {
         Set<Permission> perms = new HashSet<>();
         if (ids == null) return perms;

@@ -15,6 +15,9 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name="machine")
+/**
+ * Clase representativa de las filas de la tabla 'machine' de la base de datos
+ */
 public class Machine {
     @Id
     @JdbcTypeCode(SqlTypes.BINARY)

@@ -1,6 +1,5 @@
 package com.usbcommander.server.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,23 +10,19 @@ import com.usbcommander.server.entity.Machine;
 import com.usbcommander.server.repository.ErrorLogRepository;
 
 @Service
+/**
+ * Implementación de IErrorLogService
+ */
 public class ErrorLogService implements IErrorLogService{
     @Autowired
+    /**
+     * Repositorio vinculado al servicio
+     */
     private ErrorLogRepository repository;
     
     @Override
     public List<ErrorLog> getByErrorLogsByMachine(Machine machine) {
         return repository.findByMachine(machine);
-    }
-
-    @Override
-    public List<ErrorLog> getByRecievedDate(LocalDateTime recievedDate) {
-        return repository.findByRecievedDate(recievedDate);
-    }
-
-    @Override
-    public List<ErrorLog> getByRecievedDateBetween(LocalDateTime start, LocalDateTime end) {
-        return repository.findByRecievedDateBetween(start, end);
     }
 
     @Override

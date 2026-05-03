@@ -11,8 +11,14 @@ import com.usbcommander.server.entity.Permission;
 import com.usbcommander.server.repository.PermissionRepository;
 
 @Service
+/**
+ * Implementación de IPermissionService
+ */
 public class PermissionService implements IPermissionService{
     @Autowired
+    /**
+     * Repositorio vinculado al servicio
+     */
     private PermissionRepository repository;
 
     @Override

@@ -1,5 +1,7 @@
 package com.usbcommander.server.enums;
-
+/**
+ * Enum en el que se definen los diferentes tipos de registros con sus respectivos códigos identificativos, nombres identificativos y mensajes descriptivos asignados
+ */
 public enum LogType {
     INFO(1001, "Information", "Information log. No weird activity found"),
     CONFIG_MOD(1002, "Configuration Modified", "Someone tried to change the configuration of the application saved on the registry"),

@@ -1,5 +1,7 @@
 package com.usbcommander.server.dto;
-
+/**
+ * Clase usada únicamanete como DTO (Data transfer object) para ser enviada y recibida en comunicaciones entre el cliente y el servidor en relación a la configuración de la aplicación cliente
+ */
 public class ConfigDTO{
     private Boolean allow;
     private Long frecuency;

@@ -3,6 +3,9 @@ package com.usbcommander.server.dto;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Clase usada únicamanete como DTO (Data transfer object) para ser enviada y recibida en comunicaciones mediante peticiones REST
+ */
 public class MachineSummaryDTO {
     private UUID id;
     private String name;

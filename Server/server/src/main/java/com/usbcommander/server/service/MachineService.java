@@ -1,6 +1,5 @@
 package com.usbcommander.server.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -12,8 +11,14 @@ import com.usbcommander.server.entity.Machine;
 import com.usbcommander.server.repository.MachineRepository;
 
 @Service
+/**
+ * Implementación de IMachineService
+ */
 public class MachineService implements IMachineService{
     @Autowired
+    /**
+     * Repositorio vinculado al servicio
+     */
     private MachineRepository repository;
 
     @Override
@@ -29,11 +34,6 @@ public class MachineService implements IMachineService{
     @Override
     public List<Machine> getByEnable(Boolean disable) {
         return repository.findByDisable(disable);
-    }
-
-    @Override
-    public List<Machine> getByRegisteredDate(LocalDateTime registeredDate) {
-        return repository.findByRegisteredDate(registeredDate);
     }
 
     @Override

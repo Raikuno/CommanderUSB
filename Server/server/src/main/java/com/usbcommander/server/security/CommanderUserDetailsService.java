@@ -10,6 +10,9 @@ import com.usbcommander.server.entity.User;
 import com.usbcommander.server.repository.UserRepository;
 
 @Service
+/**
+ * Implementación de la clase de Spring UserDetailsService para construir el servicio encargado de buscar los datos del usuario registrado
+ */
 public class CommanderUserDetailsService implements UserDetailsService{
 
     @Autowired

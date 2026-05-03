@@ -3,8 +3,6 @@ package com.usbcommander.server.socket;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,8 +15,14 @@ import com.usbcommander.server.utils.CommanderLogger;
 import jakarta.annotation.PostConstruct;
 
 @Component
+/**
+ * Clase encargada de administrar las conexiones con los clientes, creando instancias de MachineTalker por cada conexión 
+ */
 public class SocketConnection {
     @Value("${usbcommander.socket.port}")
+    /**
+     * Port that will be dedicated to the socket connections with the clients
+     */
     public int port;
     
     @Autowired
@@ -26,20 +30,28 @@ public class SocketConnection {
     
     @Autowired
     private ApplicationContext context;
+    /**
+     * El objeto que representa el socket de servidor que será abierto para permitir las conexiones
+     */
     private ServerSocket socket;
-    private ExecutorService threadPool;
 
     @PostConstruct
+    /**
+     * Método a ejecutar tras la ejecución del constructor de la clase.
+     * Inicializa el ServerSocket e inicia el bucle para detectar conexiones
+     */
     public void init(){
         try {
             socket = new ServerSocket(port);
-            threadPool = Executors.newCachedThreadPool();
             startServer();
         } catch (IOException e) {
             logger.writeLog(e.getMessage());
         }
     }
 
+    /**
+     * Método empleado parra controlar las conexiones con los clientes, generando una instancia de MachineTalker por cada conexión
+     */
     public void startServer(){
         Thread process = new Thread(() -> {
             while(true){

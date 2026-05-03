@@ -14,10 +14,21 @@ import com.usbcommander.server.entity.User;
 import com.usbcommander.server.repository.SessionRepository;
 
 @Service
+/**
+ * Implementación de ISessionService
+ */
 public class SessionService implements ISessionService {
 
-    @Autowired private SessionRepository sessionRepository;
-    @Autowired private IJwtService jwtService;
+    @Autowired 
+    /**
+     * El reepositorio vinculado al servicio
+     */
+    private SessionRepository sessionRepository;
+    @Autowired 
+    /**
+     * El servicio de jwt que proporciona los métodos necesarios para tratar con estos
+     */
+    private IJwtService jwtService;
 
     private String hashToken(String token) {
         try {

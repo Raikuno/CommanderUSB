@@ -20,6 +20,9 @@ import com.usbcommander.server.utils.Validations;
 
 @RestController
 @RequestMapping("/api/account")
+/**
+ * En esta clase se definen los endpoints dedicados a las acciones de la cuenta del usuario
+ */
 public class AccountApiController {
 
     @Autowired 
@@ -30,6 +33,13 @@ public class AccountApiController {
     private ISessionService sessionService;
 
     @PostMapping("/change-password")
+    /**
+     * Método a ejecutar cuándo se lleva a cabo una petición a /api/account/change-password. 
+     * Cambia la contraseña del usuario y deshabilita todos los refresh tokens almacenados del usuario
+     * @param userDetails La información de la cuenta del usuario que en este momento esta accediendo al endpoint
+     * @param data La información enviada por la petición del usuario
+     * @return Una respuesta en función de si el usuario tiene acceso, los parametros son correctos y si la operación se ha llevado a cabo correctamente
+     */
     public ResponseEntity<?> changePassword(
             @AuthenticationPrincipal CommanderUserDetails userDetails,
             @RequestBody Map<String, String> data) {

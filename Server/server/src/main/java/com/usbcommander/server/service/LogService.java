@@ -12,8 +12,14 @@ import com.usbcommander.server.entity.Machine;
 import com.usbcommander.server.repository.LogRepository;
 
 @Service
+/**
+ * Implementación de ILogService
+ */
 public class LogService implements ILogService{
     @Autowired
+    /**
+     * Repositorio vinculado al servicio
+     */
     private LogRepository repository;
 
     @Override
@@ -24,16 +30,6 @@ public class LogService implements ILogService{
     @Override
     public List<Log> getByLogCode(Integer logCode) {
         return repository.findByLogCode(logCode);
-    }
-
-    @Override
-    public List<Log> getByRecievedDateBetweenAndMachine(LocalDateTime start, LocalDateTime end, Machine machine) {
-        return repository.findByRecievedDateBetweenAndMachine(start, end, machine);
-    }
-
-    @Override
-    public List<Log> getByCreationDateAndMachine(LocalDateTime creationDate, Machine machine) {
-        return repository.findByCreationDateAndMachine(creationDate, machine);
     }
 
     @Override
