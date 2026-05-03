@@ -4,6 +4,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Clase usada únicamanete como DTO (Data transfer object) para ser enviada y recibida en comunicaciones entre el cliente y el servidor, empleada para que el cliente pueda enviar la información de los registros al servidor
+ */
 public class LogDTO{
     
     private int usbValue;

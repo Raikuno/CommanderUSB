@@ -25,7 +25,7 @@ CREATE TABLE role_permissions (
 CREATE TABLE users (
     id BINARY(16) PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
-    name VARCHAR(64) UNIQUE NOT NULL,
+    name VARCHAR(64) NOT NULL,
     password VARCHAR(255) NOT NULL,
     disable BOOLEAN NOT NULL DEFAULT FALSE,
     role_id BINARY(16),

@@ -1,5 +1,8 @@
 package com.usbcommander.enums;
 
+/**
+ * Enum en el que se definen los diferentes tipos de registros con sus respectivos códigos identificativos
+ */
 public enum LogType {
     INFO(1001), 
     CONFIG_MOD(1002),

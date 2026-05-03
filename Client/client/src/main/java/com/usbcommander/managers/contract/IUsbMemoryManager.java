@@ -3,43 +3,48 @@ package com.usbcommander.managers.contract;
 import java.util.List;
 import java.util.Map;
 
-import com.sun.jna.platform.win32.Win32Exception;
 
+/**
+ * Clase abstracta usada como base para la creación de las clases encargadas de manipular la máquina para interactuar con las memorias usb 
+ */
 public abstract class IUsbMemoryManager {
+    /**
+     * Almacena la instancia de la clase usada en la aplicación. Este será inicializado por las clases que definan los métodos de la clase abstracta
+     */
     protected static IUsbMemoryManager instance;
     
     protected IUsbMemoryManager(){}
 
     /**
-     * This method checks the usb storage units connected to the machine and returns an array with the name, the drive letter assigned to the unit and the serial of every unit.
-     * It does not need the registry value to be 'open'
-     * @return An array with the name, the drive letter assigned to the unit and the serial of each connected usb storage unit
+     * Este método se encarga de revisar las unidades de almmacenamiento usb conectadas a la máquina y devuelve una lista con el nombre, la letra asignada a la unidad y el serial de cada unidad
+     * @return Una lista con el nombre, la letra asignada a la unidad y el serial de cada unidad conecatada a la máquina
      */
     public abstract List<Map<String, String>> getConnectedDrives();
 
     /**
-     * Check the windows registry to see if there is any usb storage unit connected to the machine
-     * @return An int repreesenting the number of usb storage units connected
+     * Revisa si existe alguna unidad de memoria usb conectada a la máquina
+     * @return El número de memorias conectadas a la máquina
      */
     public abstract int isDriveConnected();
 
     /**
-     * This method checks and returns the value saved on the windows registry related to the use of usb storage units
-     * @return the value saved on the windows registry
+     * Este método revisa si la máquina permite o no la conexión de memorias usb
+     * @return Un int que define si es posible o no conectar memorias usb
      */
-    public abstract int getAccessValue() throws Win32Exception;
+    public abstract int getAccessValue();
 
     /**
-     * Change the registry value to allow the machine to read the usb storage units connected
-     * @return A boolean representing if the instruction was succesful
+     * Este método sirve para permitir la conexión de memorias usb en la máquina
      */
-    public abstract void enableAccess() throws Win32Exception;
+    public abstract void enableAccess();
 
     /**
-     * Change the registry value to prevent the machine to read the usb storage units connected
-     * @return A boolean representing if the instruction was succesful
+     * Este método sirve para prohibir la conexión de memorias usb en la máquina
      */
-    public abstract void disableAccess() throws Win32Exception;
+    public abstract void disableAccess();
 
-    public abstract void removeExternalDrives() throws Win32Exception;
+    /**
+     * Este método tiene como finalidad, desmontar todas las unidades de memoria usb conectadas a la máquina
+     */
+    public abstract void removeExternalDrives();
 }

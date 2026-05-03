@@ -16,18 +16,40 @@ import com.usbcommander.managers.StatusManager;
 import com.usbcommander.managers.contract.IStatusManager;
 import com.usbcommander.services.contract.CommanderService;
 
+/**
+ * Servicio encargado de controlar la creación y envio de los registros de la máquina
+ */
 public class LogService extends CommanderService{
+    /**
+     * Instancia del servicio
+     */
     private static LogService instance;
+    /**
+     * Instancia de IStatusManager para la creación y almacenaje de registros
+     */
     private IStatusManager statusManager;
+    /**
+     * Instancia de IMachineConfig para la obtención de las variables de configuración de la máquina
+     */
     private IMachineConfig machineConfig;
+    /**
+     * Instancia de jackson para la serialización de registros como json
+     */
     private ObjectMapper mapper;
 
+    /**
+     * Constructor encargado de inicializar las propiedades del objeto
+     */
     private LogService(){
         this.statusManager = StatusManager.getInstance();
         this.machineConfig = MachineConfig.getInstance();
         this.mapper = new ObjectMapper().registerModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
+    /**
+     * Método estático usado para inicializar y obtener la instancia de este servicio
+     * @return La instancia inicializada del Servicio
+     */
     public static LogService getInstance(){
         if(instance == null){
             instance = new LogService();
@@ -49,6 +71,10 @@ public class LogService extends CommanderService{
         }
     }
 
+    /**
+     * Método empleado para llevar a cabo el envio de todos los registros actualmente almacenados en el cliente
+     * @throws ServiceDisabledException En el caso de que al momento de llamarse el método, este servicio no este activo
+     */
     public void sendLogs() throws ServiceDisabledException{
         if(!running){
             throw new ServiceDisabledException(AppConst.ErrorMessages.SERVICE_NOT_RUNNING);

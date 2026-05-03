@@ -14,10 +14,13 @@ import com.sun.jna.ptr.IntByReference;
 import com.usbcommander.AppConst;
 import com.usbcommander.managers.contract.IUsbMemoryManager;
 
+/**
+ * Implementación de IUsbMemoryManager para funcionar en un entorno de windows, mediante modificaciónes en el registro de windows y el uso de herramientas propias de este sistema operativo
+ */
 public class UsbMemoryManager extends IUsbMemoryManager{
 
     /**
-     * This constant represent a windows constant not present on the library jna. Is used to umount a drive
+     * Esta constante representa un valor de windows no presente en la librería de jna empleado a la hora de desmontar una unidad de memoria usb.
      */
     private final int IOCTL_STORAGE_EJECT_MEDIA = 0x2D4808;
 
@@ -25,6 +28,10 @@ public class UsbMemoryManager extends IUsbMemoryManager{
 
     }
 
+    /**
+     * Método estático que construye una instancia de IUsbMemoryManager con la implementación definida en esta clase.
+     * @return La instancia almacenada en la clase abstracta, inicializada como objeto de esta clase
+     */
     public static IUsbMemoryManager getInstance(){
         if(instance == null){
             instance = new UsbMemoryManager();
@@ -32,11 +39,6 @@ public class UsbMemoryManager extends IUsbMemoryManager{
         return instance;
     }
 
-    /**
-     * This method checks the usb storage units connected to the machine and returns an array with the name, the drive letter assigned to the unit and the serial of every unit.
-     * It does not need the registry value to be 'open'
-     * @return An array with the name, the drive letter assigned to the unit and the serial of each connected usb storage unit
-     */
     @Override
     public List<Map<String, String>> getConnectedDrives(){
         List<Map<String, String>> result = new ArrayList<>();
@@ -64,10 +66,6 @@ public class UsbMemoryManager extends IUsbMemoryManager{
         return result;
     }
 
-    /**
-     * Check the windows registry to see if there is any usb storage unit connected to the machine
-     * @return An int repreesenting the number of usb storage units connected
-     */
     @Override
     public int isDriveConnected(){
         int count = 0;
@@ -88,12 +86,8 @@ public class UsbMemoryManager extends IUsbMemoryManager{
         return count;
     }
 
-    /**
-     * This method checks and returns the value saved on the windows registry related to the use of usb storage units
-     * @return the value saved on the windows registry
-     */
     @Override
-    public int getAccessValue() throws Win32Exception{
+    public int getAccessValue(){
         String keyValue = "Start";
         return Advapi32Util.registryGetIntValue(
             AppConst.MAIN_LOCATION, 
@@ -102,12 +96,8 @@ public class UsbMemoryManager extends IUsbMemoryManager{
         
     }
 
-    /**
-     * Change the registry value to allow the machine to read the usb storage units connected
-     * @return A boolean representing if the instruction was succesful
-     */
     @Override
-    public void enableAccess() throws Win32Exception{
+    public void enableAccess(){
         String keyValue = "Start";
         Advapi32Util.registrySetIntValue(
             AppConst.MAIN_LOCATION, 
@@ -117,12 +107,8 @@ public class UsbMemoryManager extends IUsbMemoryManager{
 
     }
 
-    /**
-     * Change the registry value to prevent the machine to read the usb storage units connected
-     * @return A boolean representing if the instruction was succesful
-     */
     @Override
-    public void disableAccess() throws Win32Exception{
+    public void disableAccess(){
         String keyValue = "Start";
         Advapi32Util.registrySetIntValue(
             AppConst.MAIN_LOCATION, 
@@ -147,6 +133,10 @@ public class UsbMemoryManager extends IUsbMemoryManager{
         });
     }
 
+    /**
+     * Este método es usado a la hora de desmontar las unidades de memoria usb. Se encarga de desmontar una unidad de memoria usb en función de la letra asignada a esta.
+     * @param drive La letra a la que la memoria usb esta asignada
+     */
     private void removeDrive(String drive){
         String _drive = "\\\\.\\" + drive.substring(0,2);
         WinNT.HANDLE handler = Kernel32.INSTANCE.CreateFile(
