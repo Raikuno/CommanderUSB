@@ -15,6 +15,9 @@ import jakarta.persistence.UniqueConstraint;
 @Table(name="error_log",
     uniqueConstraints = @UniqueConstraint(columnNames = {"creation_date", "machine_id"})
 )
+/**
+ * Clase representativa de las filas de la tabla 'error_log' de la base de datos
+ */
 public class ErrorLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

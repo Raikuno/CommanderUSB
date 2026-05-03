@@ -16,6 +16,9 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "sessions")
+/**
+ * Clase representativa de las filas de la tabla 'sessions' de la base de datos
+ */
 public class Session {
     @Id
     @JdbcTypeCode(SqlTypes.BINARY)

@@ -29,9 +29,15 @@ import com.usbcommander.server.utils.WrapperMapper;
 
 @Component
 @Scope("prototype")
+/**
+ * Clase encargada de tratar las interacciones con cada cliente
+ */
 public class MachineTalker {
     @Autowired
     private IMachineService machineService;
+    /**
+     * Campo estático que permite acceder a las máquinas conectadas en este momento
+     */
     private static Map<String, MachineTalker> machines = new HashMap<>();
     @Autowired
     private WrapperMapper mapper;
@@ -47,6 +53,11 @@ public class MachineTalker {
     private Socket socket;
     private Machine machine;
 
+    /**
+     * Permite establecer y almmacenar la conexión con un cliente, registrandolo en la base de datos si este no lo estaba ya
+     * @param socket El objeto socket que representa la conexión 
+     * @throws MachineDisableException En el caso de que la máquina que se trate de conectar este deshabilitada
+     */
     public void setSocker(Socket socket) throws MachineDisableException{
         this.socket = socket;
         String ip = socket.getInetAddress().toString();
@@ -75,6 +86,9 @@ public class MachineTalker {
         machines.put(ip, this);
     }
 
+    /**
+     * Método usado para lanzar el hilo que permite empezar a escuchar los mensajes del cliente
+     */
     public void startToListen(){
         Thread listenerThread = new Thread(() -> {
             while (!socket.isClosed()) {  
@@ -97,6 +111,11 @@ public class MachineTalker {
         listenerThread.start();
     }
 
+    /**
+     * Método usado para enviar mensajes al cliente
+     * @param message El mensaje a enviar
+     * @return Un booleano en función de si la operaciión tuvo exito o no
+     */
     public boolean sendMessage(String message){
         try {
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
@@ -109,14 +128,18 @@ public class MachineTalker {
         }
     }
 
-    public static MachineTalker getMachineTalker(String ip){
-        return machines.get(ip);
-    }
-
+    /**
+     * Permite obtener la lista de máquinas conectadas
+     * @return La lista de máquinas conectadas
+     */
     public static Map<String, MachineTalker> getMachines() {
         return machines;
     }
 
+    /**
+     * Método privado que permite almacenar los registros enviados por las máquinas en la base de datos
+     * @param log
+     */
     private void saveLog(LogDTO log){
         if(log.getCode() == LogType.ERROR.getCode() || log.getCode() == LogType.CONNECTION.getCode()){
             ErrorLog errorLog = new ErrorLog();

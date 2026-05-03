@@ -6,6 +6,9 @@ import org.springframework.stereotype.Service;
 import com.usbcommander.server.entity.User;
 
 @Service
+/**
+ * Implementación de IFirstStartService
+ */
 public class FirstStartService implements IFirstStartService {
 
     @Autowired

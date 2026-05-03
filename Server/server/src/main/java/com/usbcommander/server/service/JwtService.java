@@ -17,10 +17,22 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 
 @Service
+/**
+ * Implementación de la interfaz IJwtService
+ */
 public class JwtService implements IJwtService{
 
+    /**
+     * La clave secreta a usar para la generación de tokens
+     */
     private final SecretKey key;
+    /**
+     * El tiempo de vida en segundos de los access token creados
+     */
     private final long accessTokenSeconds;
+    /**
+     * El tiempo de vida en segundos de los refresh token creados
+     */
     private final long refreshTokenSeconds;
 
     public JwtService(@Value("${jwt.secret}") String secret,

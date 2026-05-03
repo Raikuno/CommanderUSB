@@ -17,6 +17,9 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name="permissions")
+/**
+ * Clase representativa de las filas de la tabla 'permissions' de la base de datos
+ */
 public class Permission {
     @Id
     @JdbcTypeCode(SqlTypes.BINARY)

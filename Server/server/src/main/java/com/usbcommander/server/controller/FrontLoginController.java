@@ -10,12 +10,20 @@ import com.usbcommander.server.service.IFirstStartService;
 
 @Controller
 @RequestMapping("/session")
+/**
+ * En esta clase se definen los endpoints dedicados a las páginas de inicio de sesión
+ */
 public class FrontLoginController {
 
     @Autowired
     private IFirstStartService loginService;
 
     @GetMapping("/login")
+    /**
+     * Método a ejecutar cuándo se lleva a cabo una petición a /api/session/login. 
+     * Renderiza la página html pertinente. En caso de que no exista un usuario en la base de datos, redirige a la página de creación de usuario
+     * @return
+     */
     public String loginPage() {
         if (!loginService.adminAccountCreated()) {
             return "redirect:/session/create-admin";
@@ -24,6 +32,11 @@ public class FrontLoginController {
     }
 
     @GetMapping("/create-admin")
+    /**
+     * Método a ejecutar cuándo se lleva a cabo una petición a /api/session/login. 
+     * Renderiza la página html pertinente. En caso de que exista un usuario en la base de datos, redirige a la página de inicio de sesión
+     * @return
+     */
     public String adminCreationPage(){
         if (loginService.adminAccountCreated()) {
             return "redirect:/session/login";
@@ -33,6 +46,11 @@ public class FrontLoginController {
     
     @GetMapping
     ("/logout")
+    /**
+     * Método a ejecutar cuándo se lleva a cabo una petición a /api/session/login. 
+     * Renderiza la página html pertinente.
+     * @return
+     */
     public String logout() {
         return "logout.html";
     }

@@ -17,6 +17,9 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name="users")
+/**
+ * Clase representativa de las filas de la tabla 'userss' de la base de datos
+ */
 public class User {
 
     @Id

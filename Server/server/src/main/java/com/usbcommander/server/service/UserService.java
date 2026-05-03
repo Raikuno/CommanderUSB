@@ -8,15 +8,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.usbcommander.server.entity.Role;
 import com.usbcommander.server.entity.User;
 import com.usbcommander.server.repository.UserRepository;
 
 @Service
+/**
+ * Implementación de IUserService
+ */
 public class UserService implements IUserService{
     @Autowired
+    /**
+     * El repositorio vinculado al servicio
+     */
     private UserRepository repository;
     @Autowired
+    /**
+     * El objeto encargado de encriptar las contraseñas
+     */
     private PasswordEncoder passwordEncoder;
 
     @Override
@@ -27,11 +35,6 @@ public class UserService implements IUserService{
     @Override
     public Optional<User> getById(UUID id) {
         return repository.findById(id);
-    }
-
-    @Override
-    public List<User> getByRole(Role role) {
-        return repository.findByRole(role);
     }
 
     @Override

@@ -2,6 +2,9 @@ package com.usbcommander.server.dto;
 
 import java.util.List;
 
+/**
+ * Clase usada únicamanete como DTO (Data transfer object) para ser enviada y recibida en comunicaciones mediante peticiones REST
+ */
 public class RoleFormDTO {
     private String name;
     private List<String> permissionIds;

@@ -33,6 +33,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
 @RequestMapping("/api/machine")
+/**
+ * En esta clase se definen los endpoints dedicados a las acciones relacionadas a las máquinas cliente
+ */
 public class MachineApiController {
 
     @Autowired
@@ -48,6 +51,11 @@ public class MachineApiController {
     private WrapperMapper mapper;
 
     @GetMapping("/getUnrevisedMachines")
+    /**
+     * Método a ejecutar cuándo se lleva a cabo una petición a /api/machine/getUnrevisedMachines.
+     * Permite obtener todas las máquinass con logs que necesiten revisión
+     * @return Una respuesta con una lista con todas lass máquinas que tengan un log asignado que necesite de revisión
+     */
     public ResponseEntity<List<Machine>> getUnrevisedMachines() {
         List<Machine> machines = new ArrayList<>();
         logService.getAllUnrevised().forEach(t -> {
@@ -59,6 +67,11 @@ public class MachineApiController {
     }
 
     @GetMapping("")
+    /**
+     * Método a ejecutar cuándo se lleva a cabo una petición a /api/machine.
+     * Permite obtener una lista de todas las máquinas almacenadas en la base de datos
+     * @return Una respuesta con una lista con todas las máquinas almacenadas en la base de datos
+     */
     public ResponseEntity<List<MachineSummaryDTO>> getAllMachines() {
         List<MachineSummaryDTO> result = new ArrayList<>();
         for (Machine machine : machineService.getAll()) {
@@ -68,6 +81,12 @@ public class MachineApiController {
     }
 
     @GetMapping("/{id}")
+    /**
+     * Método a ejecutar cuándo se lleva a cabo una petición a /api/machine/{id}, siendo id la id de la máquina cuyos detalles desean verse
+     * Permite obtener los datos de una máquina en función de su id
+     * @param id El id de la máquina a buscar
+     * @return Una respuesta en función de si la máquina se ha encontrado o no
+     */
     public ResponseEntity<MachineSummaryDTO> getMachineById(@PathVariable UUID id) {
         Optional<Machine> machine = machineService.getById(id);
         return machine.map(m -> ResponseEntity.ok(toSummary(m)))
@@ -75,6 +94,12 @@ public class MachineApiController {
     }
 
     @GetMapping("/{id}/error-logs")
+    /**
+     * Método a ejecutar cuándo se lleva a cabo una petición a /api/machine/{id}/error-logs.
+     * Permite obtener los logs de error asignados a una máquina descrita mediante su id
+     * @param id El id de la máquina cuyos error log se quieren obtener
+     * @return Una respuesta con una lista con los error log asignados a la máquina buscada
+     */
     public ResponseEntity<List<ErrorLog>> getErrorLogsByMachine(@PathVariable UUID id) {
         Optional<Machine> machine = machineService.getById(id);
         if (machine.isEmpty()) {
@@ -84,6 +109,13 @@ public class MachineApiController {
     }
 
     @PatchMapping("/{id}")
+    /**
+     * Método a ejecutar cuándo se lleva a cabo una petición patch a /api/machine/{id}.
+     * Permite actualizar la información de una máquina descrita mediante su id
+     * @param id El id de la máquina a actualizar
+     * @param updates La información actualizada de la máquina
+     * @return Una respuesta en función de si la operación a tenido exito o no
+     */
     public ResponseEntity<?> updateMachine(@PathVariable UUID id, @RequestBody Map<String, Object> updates) {
         Optional<Machine> machineOpt = machineService.getById(id);
         if (machineOpt.isEmpty()) {
@@ -111,6 +143,13 @@ public class MachineApiController {
     }
 
     @PostMapping("/{id}/change-machine-conf")
+    /**
+     * Método a ejecutar cuándo se lleva a cabo una petición a /api/machine/{id}/change-machine-conf. Siendo id el id de la máquina cuya configuración desea modificarse
+     * Permite modificar los ajustes de una máquina cliente conectada al servidor (permitir conexiones usb o cambiar frecuencia de registros autommáticos).
+     * @param id El id de la máquina cuyos ajustes van a modificarse
+     * @param updates La información de los ajustes a modificar
+     * @return Una respuesta en función de si la operación a tenido éxito o no 
+     */
     public ResponseEntity<?> changeMachineConf(@PathVariable UUID id, @RequestBody Map<String, String> updates) {
         Optional<Machine> selectedMachine = machineService.getById(id);
         if (selectedMachine.isEmpty()) {
@@ -161,6 +200,11 @@ public class MachineApiController {
         }
     }
 
+    /**
+     * Este método permite transformar una entidad de Machine a MachineSummaryDTO para un trato más fácil a la hora de enviar y recibir respuestas mediante peticiones por api
+     * @param machine La entidad Machine que desea transformarse a MachineSummaryDTO
+     * @return Un MMachineSummaryDTO con información equivalente a la de la entidad introducida por parámetro
+     */
     private MachineSummaryDTO toSummary(Machine machine) {
         MachineSummaryDTO dto = new MachineSummaryDTO();
         dto.setId(machine.getId());
@@ -175,6 +219,11 @@ public class MachineApiController {
         return dto;
     }
 
+    /**
+     * Este método permite obtener el log de una máquina que requiera revisión más 'importante'.
+     * @param machine La máquina cuyos logs serán revisados
+     * @return Un entero en función del resulttado de la evaluación
+     */
     private Integer topUnrevisedLogCode(Machine machine) {
         List<Log> unrevised = logService.getByMachineAndNeedsRevission(machine, true);
         Integer dangerCode = null, warningCode = null, infoCode = null;

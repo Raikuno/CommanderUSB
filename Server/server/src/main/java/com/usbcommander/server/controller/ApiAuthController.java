@@ -33,6 +33,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
 @RequestMapping("/api/auth")
+/**
+ * En esta clase se definen los endpoints dedicados a las acciones relacionadas con la autenticación de usuario
+ */
 public class ApiAuthController {
 
     @Autowired
@@ -49,6 +52,12 @@ public class ApiAuthController {
     private boolean cookieSecure;
 
     @PostMapping("/firstuser")
+    /**
+     * Método a ejecutar cuándo se lleva a cabo una petición a /api/auth/change-firstuser. 
+     * Permite crear un usuario administrador en caso de que no existan usuarios en la base de datos.
+     * @param payload La información de la petición del usuario 
+     * @return Una respuesta en función de si se ha creado o no la cuenta de usuario
+     */
     public ResponseEntity<String> getMethodName(@RequestBody Map<String, String> payload) {
         if (loginService.adminAccountCreated()) {
             return ResponseEntity.badRequest().body("Admin account already exists");
@@ -78,6 +87,12 @@ public class ApiAuthController {
     }
 
     @PostMapping("/login")
+    /**
+     * Método a ejecutar cuándo se lleva a cabo una petición a /api/auth/login. 
+     * Permite iniciar sesión a un usuario si este introduce correctamente las credenciales.
+     * @param body La información de la petición del usuario 
+     * @return Una respuesta en función de si se ha iniciado sesión o no correctammnete. En caso de que se haya iniciado sesión, se devolverán el refresh token y el authentication token generados
+     */
     public ResponseEntity<?> login(@RequestBody Map<String, String> body) {
         String email = body.getOrDefault("email", "").trim();
         String password = body.getOrDefault("password", "").trim();
@@ -124,6 +139,12 @@ public class ApiAuthController {
     }
 
     @PostMapping("/refresh")
+    /**
+     * Método a ejecutar cuándo se lleva a cabo una petición a /api/auth/refresh. 
+     * Método dedicado a implementaciones de cliente del servidor que no esten basados en web. Devolverá un nuevo authentication token en base al refresh token enviado, si es que se ha enviado uno
+     * @param body La información de la petición del usuario 
+     * @return Una respuesta en función de si el refresh token ha sido validado o no. En caso de que el refresh token sea válido, se devolverá un nuevo access token
+     */
     public ResponseEntity<?> refresh(@RequestBody(required = false) Map<String, String> body,
             HttpServletRequest request) {
         String refreshToken = null;
@@ -171,6 +192,12 @@ public class ApiAuthController {
     }
 
     @GetMapping("/logout")
+    /**
+     * Método a ejecutar cuándo se lleva a cabo una petición a /api/auth/logout. 
+     * Permite al usuario cerrar sesión, eliminando las cookies que almacenan los token e invalidando el refresh token en la base de datos.
+     * @param request La informacción de la petición del usuario
+     * @return Una respuesta encargada de vaciar las cookies pertinentes y devolver un access token y refresh token vacios/
+     */
     public ResponseEntity<?> logout(HttpServletRequest request) {
         if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
