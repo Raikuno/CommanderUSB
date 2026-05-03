@@ -1,0 +1,5 @@
+var searchData=
+[
+  ['name_0',['name',['../classcom_1_1usbcommander_1_1server_1_1dto_1_1MachineSummaryDTO.html#af22f5a746ad6d426af013a0cad4d2344',1,'com.usbcommander.server.dto.MachineSummaryDTO.name'],['../classcom_1_1usbcommander_1_1server_1_1dto_1_1RoleFormDTO.html#a9256af9fb7a2450f44672f62f6e80f46',1,'com.usbcommander.server.dto.RoleFormDTO.name'],['../classcom_1_1usbcommander_1_1server_1_1entity_1_1Machine.html#ad71e0ad6003019ade7b69cfc85ce9aa5',1,'com.usbcommander.server.entity.Machine.name'],['../classcom_1_1usbcommander_1_1server_1_1entity_1_1Permission.html#a6dc059237da8098c5d14c2d37eae5db4',1,'com.usbcommander.server.entity.Permission.name'],['../classcom_1_1usbcommander_1_1server_1_1entity_1_1Role.html#a5ec44721f00510182367e321a82de3a5',1,'com.usbcommander.server.entity.Role.name'],['../classcom_1_1usbcommander_1_1server_1_1entity_1_1User.html#ac6df5f457eacf50b8248eafb3d68c713',1,'com.usbcommander.server.entity.User.name']]],
+  ['needsrevission_1',['needsRevission',['../classcom_1_1usbcommander_1_1server_1_1entity_1_1Log.html#aa1b3fdb52e035a744b236a4ffa22d85f',1,'com::usbcommander::server::entity::Log']]]
+];

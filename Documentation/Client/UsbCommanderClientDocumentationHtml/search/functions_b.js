@@ -1,0 +1,26 @@
+var searchData=
+[
+  ['saveconfig_0',['saveConfig',['../classcom_1_1usbcommander_1_1config_1_1contract_1_1IMachineConfig.html#a8315b69ecc71531b81802a2b70dd1a4b',1,'com.usbcommander.config.contract.IMachineConfig.saveConfig()'],['../classcom_1_1usbcommander_1_1config_1_1MachineConfig.html#a2d54f348fd4ed3771b1c9efaa5902c1e',1,'com.usbcommander.config.MachineConfig.saveConfig()']]],
+  ['securityservice_1',['SecurityService',['../classcom_1_1usbcommander_1_1services_1_1SecurityService.html#ac9fb19a1a292298f369e85ab400c420b',1,'com::usbcommander::services::SecurityService']]],
+  ['sendlogs_2',['sendLogs',['../classcom_1_1usbcommander_1_1services_1_1LogService.html#ac696f5497aa76cf64a94beee656f0f29',1,'com::usbcommander::services::LogService']]],
+  ['sendmessage_3',['sendMessage',['../classcom_1_1usbcommander_1_1services_1_1ServerConnectionService.html#ac962a3a2b3c01694b684b02218a1744f',1,'com::usbcommander::services::ServerConnectionService']]],
+  ['serverconnectionservice_4',['ServerConnectionService',['../classcom_1_1usbcommander_1_1services_1_1ServerConnectionService.html#a61d31ecb5203d91a2eca93de43ee6c75',1,'com::usbcommander::services::ServerConnectionService']]],
+  ['servicedisabledexception_5',['ServiceDisabledException',['../classcom_1_1usbcommander_1_1errors_1_1ServiceDisabledException.html#a0a919389e0caddb9be6e72b226ce209c',1,'com::usbcommander::errors::ServiceDisabledException']]],
+  ['setallow_6',['setAllow',['../classcom_1_1usbcommander_1_1dto_1_1ConfigDTO.html#a303a57c3743383dff031a54a84428160',1,'com::usbcommander::dto::ConfigDTO']]],
+  ['setallowedtime_7',['setAllowedTime',['../classcom_1_1usbcommander_1_1dto_1_1ConfigDTO.html#a0c2360d6278c0d8317f349dc9203cbe0',1,'com::usbcommander::dto::ConfigDTO']]],
+  ['setcode_8',['setCode',['../classcom_1_1usbcommander_1_1dto_1_1LogDTO.html#a4d14053dab8121bcb9fbb1ac0a3244c1',1,'com::usbcommander::dto::LogDTO']]],
+  ['setcreationdate_9',['setCreationDate',['../classcom_1_1usbcommander_1_1dto_1_1LogDTO.html#ace26319edbf74a9b155d7e534a5dd232',1,'com::usbcommander::dto::LogDTO']]],
+  ['seterrormessage_10',['setErrorMessage',['../classcom_1_1usbcommander_1_1dto_1_1LogDTO.html#a88c959ec55760fb91a691b3b91f901e0',1,'com::usbcommander::dto::LogDTO']]],
+  ['setfrecuency_11',['setFrecuency',['../classcom_1_1usbcommander_1_1dto_1_1ConfigDTO.html#a5066b43819e2c0618a815bbe7c4ec749',1,'com::usbcommander::dto::ConfigDTO']]],
+  ['setlisteneron_12',['setListenerOn',['../classcom_1_1usbcommander_1_1services_1_1SecurityService.html#abffe340291789f6e1d30c44d29150e90',1,'com::usbcommander::services::SecurityService']]],
+  ['setlogfrecuency_13',['setLogFrecuency',['../classcom_1_1usbcommander_1_1config_1_1contract_1_1IMachineConfig.html#a735d654db7008f901257cad036bf99a0',1,'com.usbcommander.config.contract.IMachineConfig.setLogFrecuency()'],['../classcom_1_1usbcommander_1_1config_1_1MachineConfig.html#a59e225369e687388e30a317c40844325',1,'com.usbcommander.config.MachineConfig.setLogFrecuency()']]],
+  ['setusballowed_14',['setUsbAllowed',['../classcom_1_1usbcommander_1_1dto_1_1LogDTO.html#a0df0262a0ea7c85fdbe9e566fc76a921',1,'com::usbcommander::dto::LogDTO']]],
+  ['setusbenable_15',['setUsbEnable',['../classcom_1_1usbcommander_1_1config_1_1contract_1_1IMachineConfig.html#ac8568ccdb891438fba28f8214ce39e01',1,'com.usbcommander.config.contract.IMachineConfig.setUsbEnable()'],['../classcom_1_1usbcommander_1_1config_1_1MachineConfig.html#aaccc9bf4f7322414add1bccbf5fd0cec',1,'com.usbcommander.config.MachineConfig.setUsbEnable()']]],
+  ['setusblist_16',['setUsbList',['../classcom_1_1usbcommander_1_1dto_1_1LogDTO.html#afcac090e3ecc887e410759b1be74dbbb',1,'com::usbcommander::dto::LogDTO']]],
+  ['setusbvalue_17',['setUsbValue',['../classcom_1_1usbcommander_1_1dto_1_1LogDTO.html#ab186f6fd8ad3813f1b94cd992edddb22',1,'com::usbcommander::dto::LogDTO']]],
+  ['shouldanswerwithtrue_18',['shouldAnswerWithTrue',['../classcom_1_1usbcommander_1_1AppTest.html#aae659a4bbc7e1c329f592511751b5666',1,'com::usbcommander::AppTest']]],
+  ['start_19',['start',['../classcom_1_1usbcommander_1_1services_1_1contract_1_1CommanderService.html#aecc3d667f1453dba2c93fe509e77d722',1,'com::usbcommander::services::contract::CommanderService']]],
+  ['startlistener_20',['startListener',['../classcom_1_1usbcommander_1_1services_1_1SecurityService.html#a47d4104761a39339523ade72657af1f9',1,'com::usbcommander::services::SecurityService']]],
+  ['statusmanager_21',['StatusManager',['../classcom_1_1usbcommander_1_1managers_1_1StatusManager.html#a4ff7e2cfc8cf7abaaaa210811b7a2d5c',1,'com::usbcommander::managers::StatusManager']]],
+  ['stopservice_22',['stopService',['../classcom_1_1usbcommander_1_1services_1_1contract_1_1CommanderService.html#abbceefbcf9ebcffb7d7b9ce05cd051e0',1,'com::usbcommander::services::contract::CommanderService']]]
+];

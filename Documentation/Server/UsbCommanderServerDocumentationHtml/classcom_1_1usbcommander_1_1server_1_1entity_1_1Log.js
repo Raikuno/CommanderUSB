@@ -1,0 +1,27 @@
+var classcom_1_1usbcommander_1_1server_1_1entity_1_1Log =
+[
+    [ "getCreationDate", "classcom_1_1usbcommander_1_1server_1_1entity_1_1Log.html#a2d7efc7385a283cae5bc8a4cf99e0fbb", null ],
+    [ "getId", "classcom_1_1usbcommander_1_1server_1_1entity_1_1Log.html#a2258dd1fc28bbf6888c15f40b72675aa", null ],
+    [ "getLogCode", "classcom_1_1usbcommander_1_1server_1_1entity_1_1Log.html#ab75304aea96ab8995ce46aa1f6bf6394", null ],
+    [ "getMachine", "classcom_1_1usbcommander_1_1server_1_1entity_1_1Log.html#aebc2662d681c913cd5120d740ec4dc21", null ],
+    [ "getNeedsRevission", "classcom_1_1usbcommander_1_1server_1_1entity_1_1Log.html#acd0f4792228678e04626886a623ecf33", null ],
+    [ "getRecievedDate", "classcom_1_1usbcommander_1_1server_1_1entity_1_1Log.html#afb811194d88bbc36a8959dd753c757e7", null ],
+    [ "getUsbAllowed", "classcom_1_1usbcommander_1_1server_1_1entity_1_1Log.html#a8701b36caa1aa09468b8e9f53dbf7b88", null ],
+    [ "getUsbValue", "classcom_1_1usbcommander_1_1server_1_1entity_1_1Log.html#a868516a7a633102768c503b775800cca", null ],
+    [ "setCreationDate", "classcom_1_1usbcommander_1_1server_1_1entity_1_1Log.html#ae26eb09de0bb2417d41de270e9285e6b", null ],
+    [ "setId", "classcom_1_1usbcommander_1_1server_1_1entity_1_1Log.html#a1ef7eb7e472044ff43221918dd099770", null ],
+    [ "setLogCode", "classcom_1_1usbcommander_1_1server_1_1entity_1_1Log.html#a76166aaa0902c8b5163f5d876eb1f0bf", null ],
+    [ "setMachine", "classcom_1_1usbcommander_1_1server_1_1entity_1_1Log.html#a7e09d12c25b26d7ebae42b64e55b0fe8", null ],
+    [ "setNeedsRevission", "classcom_1_1usbcommander_1_1server_1_1entity_1_1Log.html#af4fc00ebb225b7a7bb97476462fc7089", null ],
+    [ "setRecievedDate", "classcom_1_1usbcommander_1_1server_1_1entity_1_1Log.html#ac6b2063c6e4b8fe835c27fdf38896fe0", null ],
+    [ "setUsbAllowed", "classcom_1_1usbcommander_1_1server_1_1entity_1_1Log.html#ad8096f9535597ace5420694b006aa891", null ],
+    [ "setUsbValue", "classcom_1_1usbcommander_1_1server_1_1entity_1_1Log.html#a03f98b8afee91035cd1f815d8a69b73d", null ],
+    [ "creationDate", "classcom_1_1usbcommander_1_1server_1_1entity_1_1Log.html#a61fe713440c57378de974aeacea2b0b1", null ],
+    [ "id", "classcom_1_1usbcommander_1_1server_1_1entity_1_1Log.html#ad26d7f7fbe37a4be2361c805eecbbd4a", null ],
+    [ "logCode", "classcom_1_1usbcommander_1_1server_1_1entity_1_1Log.html#a0e202ad25b0b3d349229b14be0bea717", null ],
+    [ "machine", "classcom_1_1usbcommander_1_1server_1_1entity_1_1Log.html#ade2ccb79e942921dbb23cacf0ce8f680", null ],
+    [ "needsRevission", "classcom_1_1usbcommander_1_1server_1_1entity_1_1Log.html#aa1b3fdb52e035a744b236a4ffa22d85f", null ],
+    [ "recievedDate", "classcom_1_1usbcommander_1_1server_1_1entity_1_1Log.html#a418204ee7e8077560e4bc1759db2ca21", null ],
+    [ "usbAllowed", "classcom_1_1usbcommander_1_1server_1_1entity_1_1Log.html#af846b71bf98e92ed382368217724f596", null ],
+    [ "usbValue", "classcom_1_1usbcommander_1_1server_1_1entity_1_1Log.html#a69554fa65b24f12c8d711ad3942e596b", null ]
+];

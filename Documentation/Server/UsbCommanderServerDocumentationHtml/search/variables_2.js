@@ -1,0 +1,10 @@
+var searchData=
+[
+  ['code_0',['code',['../classcom_1_1usbcommander_1_1server_1_1dto_1_1LogDTO.html#aa591eb36d8c79db6e398097fa6c4b00a',1,'com.usbcommander.server.dto.LogDTO.code'],['../enumcom_1_1usbcommander_1_1server_1_1enums_1_1LogType.html#a5f6f8815969c357b9e5377b65dd78e2d',1,'com.usbcommander.server.enums.LogType.code']]],
+  ['config_5fmod_1',['CONFIG_MOD',['../enumcom_1_1usbcommander_1_1server_1_1enums_1_1LogType.html#a164c8fe862a6b353816bb23fb6aaf788',1,'com::usbcommander::server::enums::LogType']]],
+  ['connected_2',['connected',['../classcom_1_1usbcommander_1_1server_1_1dto_1_1MachineSummaryDTO.html#a00981b0e9f1c0cdf00225f456977cbd2',1,'com::usbcommander::server::dto::MachineSummaryDTO']]],
+  ['connection_3',['CONNECTION',['../enumcom_1_1usbcommander_1_1server_1_1enums_1_1LogType.html#ae884e4faa3afab676e17a8893aa29974',1,'com::usbcommander::server::enums::LogType']]],
+  ['context_4',['context',['../classcom_1_1usbcommander_1_1server_1_1socket_1_1SocketConnection.html#ad17c0f192aa0cbffd6c386abc2d7bf29',1,'com::usbcommander::server::socket::SocketConnection']]],
+  ['cookiesecure_5',['cookieSecure',['../classcom_1_1usbcommander_1_1server_1_1controller_1_1ApiAuthController.html#a8c14ecf71ca7b6d0b6df5db7472d3556',1,'com.usbcommander.server.controller.ApiAuthController.cookieSecure'],['../classcom_1_1usbcommander_1_1server_1_1security_1_1JwtAuthenticationFilter.html#a5ed73bfb1a219cf0edd444fc0d52bb6c',1,'com.usbcommander.server.security.JwtAuthenticationFilter.cookieSecure']]],
+  ['creationdate_6',['creationDate',['../classcom_1_1usbcommander_1_1server_1_1dto_1_1LogDTO.html#a070185a045686e15588d5392e9c21dc0',1,'com.usbcommander.server.dto.LogDTO.creationDate'],['../classcom_1_1usbcommander_1_1server_1_1entity_1_1ErrorLog.html#a00edb48575259d625439d4ba6f72ff7f',1,'com.usbcommander.server.entity.ErrorLog.creationDate'],['../classcom_1_1usbcommander_1_1server_1_1entity_1_1Log.html#a61fe713440c57378de974aeacea2b0b1',1,'com.usbcommander.server.entity.Log.creationDate']]]
+];
