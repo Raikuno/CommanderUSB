@@ -25,9 +25,9 @@ CREATE TABLE role_permissions (
 CREATE TABLE users (
     id BINARY(16) PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
-    name VARCHAR(64) UNIQUE NOT NULL,
+    name VARCHAR(64) NOT NULL,
     password VARCHAR(255) NOT NULL,
-    enabled BOOLEAN NOT NULL DEFAULT TRUE,
+    disable BOOLEAN NOT NULL DEFAULT FALSE,
     role_id BINARY(16),
     FOREIGN KEY (role_id) REFERENCES roles(id)
 );
@@ -35,20 +35,20 @@ CREATE TABLE users (
 CREATE TABLE sessions(
     id BINARY(16) PRIMARY KEY,
     user_id BINARY(16) NOT NULL,
-    creation_dt DATETIME NOT NULL,
-    expiration_dt DATETIME NOT NULL,
-    token VARCHAR(255) NOT NULL UNIQUE,
-    closed BOOLEAN NOT NULL DEFAULT FALSE,
+    selector CHAR(36) NOT NULL,
+    token CHAR(64) NOT NULL UNIQUE,
+    blacklisted BOOLEAN NOT NULL DEFAULT FALSE,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 CREATE TABLE machine (
     id BINARY(16) PRIMARY KEY,
-    name VARCHAR(64) NOT NULL,
+    name VARCHAR(64) NOT NULL UNIQUE,
+    ip VARCHAR(16) NOT NULL UNIQUE,
     reg_dt DATETIME NOT NULL,
     description VARCHAR(255),
-    enable BOOLEAN NOT NULL DEFAULT TRUE,
-    log_frec INT UNSIGNED NOT NULL
+    disable BOOLEAN NOT NULL DEFAULT FALSE,
+    log_frec BIGINT UNSIGNED NOT NULL
 );
 
 
@@ -60,7 +60,9 @@ CREATE TABLE log (
     usb_allowed BOOLEAN NOT NULL,
     usb_list TEXT,
     log_code INT,
-    expected_date DATETIME NOT NULL,
+    needs_rev BOOLEAN NOT NULL,
+    creation_date DATETIME NOT NULL,
+    CONSTRAINT unique_creation_date_machine UNIQUE (creation_date, machine_id),
     FOREIGN KEY (machine_id) REFERENCES machine(id)
     
 );
@@ -69,7 +71,9 @@ CREATE TABLE error_log (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     machine_id BINARY(16) NOT NULL,
     receive_date DATETIME NOT NULL,
+    creation_date DATETIME NOT NULL,
     message TEXT,
+    CONSTRAINT unique_error_creation_date_machine UNIQUE (creation_date, machine_id),
     FOREIGN KEY (machine_id) REFERENCES machine(id)
 );
 

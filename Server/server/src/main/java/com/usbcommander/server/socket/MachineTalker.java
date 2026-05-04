@@ -163,6 +163,7 @@ public class MachineTalker {
             newLog.setRecievedDate(LocalDateTime.now());
             newLog.setUsbValue(log.getUsbValue());
             newLog.setCreationDate(log.getCreationDate());
+            newLog.setUsbList(log.getUsbList().toString());
             if(log.getCode() == LogType.INFO.getCode()){
                 newLog.setNeedsRevission(false); 
             } else {

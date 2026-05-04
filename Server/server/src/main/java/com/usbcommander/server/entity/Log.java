@@ -42,6 +42,9 @@ public class Log {
     @Column(nullable=false, name="log_code")
     private Integer logCode;
     
+    @Column(nullable = true, name = "usb_list")
+    private String usbList;
+
     @Column(name="creation_date", nullable=false)
     private LocalDateTime creationDate;
 
@@ -110,6 +113,14 @@ public class Log {
 
     public void setNeedsRevission(Boolean needsRevission) {
         this.needsRevission = needsRevission;
+    }
+
+    public String getUsbList() {
+        return usbList;
+    }
+
+    public void setUsbList(String usbList) {
+        this.usbList = usbList;
     }
 
     

@@ -14,7 +14,7 @@ public class HomePageController {
      * Renderiza la página html pertinente.
      * @return
      */
-    public String getMethodName() {
+    public String welcomePage() {
         return "welcome.html";
     }
 

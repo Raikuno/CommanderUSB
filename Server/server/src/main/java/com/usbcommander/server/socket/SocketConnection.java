@@ -23,7 +23,7 @@ public class SocketConnection {
     /**
      * Port that will be dedicated to the socket connections with the clients
      */
-    public int port;
+    private int port;
     
     @Autowired
     private CommanderLogger logger;
