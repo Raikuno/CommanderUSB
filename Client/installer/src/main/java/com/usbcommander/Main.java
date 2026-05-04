@@ -79,26 +79,25 @@ public class Main {
         
 
             if(uninstall.get()){
-                for(int i=0; i<2; i++){
-                    
-                    installer.stopScheduledTask();
+                var retry = true;
+                installer.stopScheduledTask();
+                try{
+                    installer.registryDeletion();
+                }catch(Exception ex){
+                    System.out.println("Eror on registry deletion");
+                }
+                try{
+                    installer.logRegistryDeletion();
+                }catch(Exception ex){
+                    System.out.println("Eror on log registry deletion");
+                }
+                for(int i =0; i<2&&retry; i++){
                     try{
-                        installer.registryDeletion();
-                    }catch(Exception ex){
-                        System.out.println("Eror on registry deletion");
-                        
-                    }
-                    try{
-                        installer.logRegistryDeletion();
-                    }catch(Exception ex){
-                        System.out.println("Eror on log registry deletion");
-                    }
-                    try{
-                        installer.deleteApplication();
+                    installer.deleteApplication();
+                    retry = false;
                     }catch(Exception ex){
                         System.out.println("Eror on file deletion");
                     }
-                    
                 }
                     return;
                 }

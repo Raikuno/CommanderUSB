@@ -39,13 +39,17 @@ function renderLog(log) {
         ['Received Date', escapeHtml(formatDate(log.recievedDate))]
     ];
 
+    const usbListHtml = log.usbList
+        ? `<tr><td><strong>USB List</strong></td><td><pre class="mb-0" style="white-space:pre-wrap;word-break:break-all;">${escapeHtml(log.usbList)}</pre></td></tr>`
+        : '';
+
     document.getElementById('log-detail-tbody').innerHTML = rows
         .map(([label, value]) => `
             <tr>
                 <td><strong>${label}</strong></td>
                 <td>${value}</td>
             </tr>`)
-        .join('');
+        .join('') + usbListHtml;
 
     if(document.getElementById('revise-btn') !== null){
         document.getElementById('revise-btn').disabled = !log.needsRevission;
