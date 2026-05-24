@@ -1,5 +1,15 @@
 # Usb Commander
 > *Realizado por [Jorge Rojas Díaz](https://github.com/Raikuno) para el GFGS DAW en I.E.S. Kursaal Curso 25/26*
+Shield: [![CC BY 4.0][cc-by-shield]][cc-by]
+
+This work is licensed under a
+[Creative Commons Attribution 4.0 International License][cc-by].
+
+[![CC BY 4.0][cc-by-image]][cc-by]
+
+[cc-by]: http://creativecommons.org/licenses/by/4.0/
+[cc-by-image]: https://i.creativecommons.org/l/by/4.0/88x31.png
+[cc-by-shield]: https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg
 
 La finalidad de este proyecto es la de ofrecer un sistema de supervisión y un cierto grado de control para aquellos equipos que, 
 ya sea por contener información sensible o por cualquier otro motivo, no se desee que se permita una conexión USB con dispositivos de almacenamiento externo.
