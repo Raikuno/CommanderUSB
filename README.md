@@ -1,5 +1,4 @@
 # Usb Commander
-> *Realizado por [Jorge Rojas Díaz](https://github.com/Raikuno) para el GFGS DAW en I.E.S. Kursaal Curso 25/26*
 Shield: [![CC BY 4.0][cc-by-shield]][cc-by]
 
 This work is licensed under a
