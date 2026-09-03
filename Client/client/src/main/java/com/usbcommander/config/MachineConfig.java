@@ -1,4 +1,5 @@
 package com.usbcommander.config;
+import com.google.inject.Singleton;
 import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.Win32Exception;
 import com.usbcommander.AppConst;
@@ -7,6 +8,7 @@ import com.usbcommander.config.contract.IMachineConfig;
 /**
  * Implementación de IMachineConfig para máquinas con windows como sistema operativo
  */
+@Singleton 
 public class MachineConfig extends IMachineConfig{
     /**
      * Valor que almacena si debería ser posible montar unidades de memoria usb extraibles en la máquina
@@ -26,59 +28,33 @@ public class MachineConfig extends IMachineConfig{
     private Integer port;
     
     /**
-     * Constructor usado cuando no se encuentra configuración previa. 
-     * Almacena los valores por defecto de configuración de la aplicación en el registro de windows
+     * Constructor que tratará de leer los archivos de configuración. Si no existen, se crearán con valores por defecto
      */
-    private MachineConfig(){
-        this.usbEnable = false;
-        this.logFrecuency = 300000;
+    public MachineConfig(){
         try{
-            Advapi32Util.registryCreateKey(
-                AppConst.MAIN_LOCATION, 
-                AppConst.ConfigReferences.CONFIG_LOCATION);
+            long logValue;
+            this.usbEnable = Advapi32Util.registryGetIntValue(
+                AppConst.MAIN_LOCATION,
+                AppConst.ConfigReferences.CONFIG_LOCATION, 
+                AppConst.ConfigReferences.USB_ALLOW_ENTRY ) == 0 ? false : true;
+
+            this.logFrecuency = (logValue = Advapi32Util.registryGetLongValue(
+                AppConst.MAIN_LOCATION,
+                AppConst.ConfigReferences.CONFIG_LOCATION,
+                AppConst.ConfigReferences.LOG_ENTRY)) > AppConst.ConfigReferences.MIN_FRECUENNCY ?
+                logValue : AppConst.ConfigReferences.MIN_FRECUENNCY;
         }catch(Win32Exception err){
-            System.out.println(err.getMessage());
-        }
-        saveConfig();
-    }
-
-    /**
-     * Constructor usado cuándo se encuentran valores almacenados de configuración de la aplicación en el registro de windows
-     * @param usbEnable Si se deberían poder (true) o no (false) poder montar memorias usb
-     * @param logFrecuency La frecuencia en milesimas de segundo con la que se envían los registros automáticos
-     */
-    private MachineConfig(boolean usbEnable, long logFrecuency){
-        this.usbEnable = usbEnable;
-        this.logFrecuency = logFrecuency;
-    }
-
-    /**
-     * Método estático que construye una instancia de IMachineConfig con la implementación definida en esta clase.
-     * En función de si encuentra o no los valores necesarios en el registro de winndows, hará uso de un constructor u otro.
-     * @return La instancia almacenada en la clase abstracta, inicializada como objeto de esta clase
-     */
-    public static IMachineConfig getInstance(){
-        if(instance == null){
+            this.usbEnable = false;
+            this.logFrecuency = 300000;
             try{
-                long logValue;
-                instance = new MachineConfig(
-                    Advapi32Util.registryGetIntValue(
-                        AppConst.MAIN_LOCATION,
-                        AppConst.ConfigReferences.CONFIG_LOCATION, 
-                        AppConst.ConfigReferences.USB_ALLOW_ENTRY ) == 0?false:true,
-
-                    (logValue = Advapi32Util.registryGetLongValue(
-                        AppConst.MAIN_LOCATION, 
-                        AppConst.ConfigReferences.CONFIG_LOCATION, 
-                        AppConst.ConfigReferences.LOG_ENTRY)) > AppConst.ConfigReferences.MIN_FRECUENNCY?
-                        logValue:AppConst.ConfigReferences.MIN_FRECUENNCY
-                );
-            }catch(Win32Exception err){
-                instance = new MachineConfig();
+                Advapi32Util.registryCreateKey(
+                    AppConst.MAIN_LOCATION,
+                    AppConst.ConfigReferences.CONFIG_LOCATION);
+            }catch(Win32Exception createErr){
+                System.out.println(createErr.getMessage());
             }
         }
-
-        return instance;
+        saveConfig();
     }
 
     @Override

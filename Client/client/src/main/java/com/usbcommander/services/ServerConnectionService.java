@@ -4,10 +4,13 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Collections;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
 import com.usbcommander.AppConst;
 import com.usbcommander.config.MachineConfig;
 import com.usbcommander.config.contract.IMachineConfig;
@@ -22,11 +25,8 @@ import com.usbcommander.services.contract.CommanderService;
 /**
  * Servicio encargado de contolar la conexión con el servidor
  */
+@Singleton
 public class ServerConnectionService extends CommanderService{
-    /**
-     * Instancia del servicio
-     */
-    private static ServerConnectionService instance;
     /**
      * Mensaje de error a usar cuándo se produce un error al enviar información al servidor
      */
@@ -58,11 +58,12 @@ public class ServerConnectionService extends CommanderService{
     /**
      * Instancia de IMachineConfig para obtener la dirección del servidor
      */
-    private IMachineConfig machineConfig;
+    private final IMachineConfig machineConfig;
     /**
      * Instancia de IStatusManager para la creación de registros de error
      */
-    private IStatusManager statusManager;
+    private final IStatusManager statusManager;
+    private final Provider<SecurityService> securityServiceProvider;
     /**
      * Variable encargada de almacenar si existe o no una conexión con el servidor
      */
@@ -72,25 +73,15 @@ public class ServerConnectionService extends CommanderService{
      */
     private ObjectMapper mapper;
 
-    /**
-     * Constructor encargado de inicializar las propiedades del objeto
-     */
-    private ServerConnectionService(){
-        machineConfig = MachineConfig.getInstance();
-        statusManager = StatusManager.getInstance();
+    @com.google.inject.Inject
+    public ServerConnectionService(IMachineConfig machineConfig,
+                                  IStatusManager statusManager,
+                                  com.google.inject.Provider<SecurityService> securityServiceProvider){
+        this.machineConfig = machineConfig;
+        this.statusManager = statusManager;
+        this.securityServiceProvider = securityServiceProvider;
         mapper = new ObjectMapper().registerModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         connectToServer();
-    }
-
-    /**
-     * Método estático usado para inicializar y obtener la instancia de este servicio
-     * @return La instancia inicializada del Servicio
-     */
-    public static ServerConnectionService getInstance(){
-        if(instance == null){
-            instance = new ServerConnectionService();
-        }
-        return instance;
     }
 
     @Override
@@ -103,10 +94,10 @@ public class ServerConnectionService extends CommanderService{
                     connectToServer();
                     retry_count += 1;
                     if (retry_count == MAX_RETRY) {
-                        statusManager.generateLog(LogType.CONNECTION, MAX_RETRY_MSG);
+                        statusManager.generateLog(LogType.CONNECTION, MAX_RETRY_MSG, -1, Collections.emptyList());
                     }
                 } catch (InterruptedException e) {
-                    statusManager.generateLog(LogType.ERROR, e.getMessage());
+                    statusManager.generateErrorLog(e.getMessage());
                     running = false;
                 }
             }
@@ -129,7 +120,7 @@ public class ServerConnectionService extends CommanderService{
             
         } catch (IOException e) {
             connected = false;
-            statusManager.generateLog(LogType.CONNECTION, CONN_ERROR + e.getMessage());
+            statusManager.generateErrorLog(CONN_ERROR + e.getMessage());
         }
     }
 
@@ -147,27 +138,27 @@ public class ServerConnectionService extends CommanderService{
                     ConfigDTO newConfig = mapper.readValue(message, ConfigDTO.class);
 
                     if(newConfig.getFrecuency() != null){
-                        SecurityService.getInstance().changeLogFrecuency(newConfig.getFrecuency());
+                        securityServiceProvider.get().changeLogFrecuency(newConfig.getFrecuency());
                     }
 
                     if(newConfig.isAllow() != null && newConfig.isAllow() && newConfig.getAllowedTime() != null){
-                        SecurityService.getInstance().openAccess(newConfig.getAllowedTime());
+                        securityServiceProvider.get().openAccess(newConfig.getAllowedTime());
                     }
 
                     if(newConfig.isAllow() != null && !newConfig.isAllow()){
-                        SecurityService.getInstance().forceClose();
+                        securityServiceProvider.get().forceClose();
                     }
                     
                 }
             }
             catch (IOException e) {
-                statusManager.generateLog(LogType.CONNECTION, SERVER_MSG_ERROR + e.getMessage());
+                statusManager.generateErrorLog(SERVER_MSG_ERROR + e.getMessage());
                 error = true;
                 connected = false;
             } catch (ServiceDisabledException e) {
-                statusManager.generateLog(LogType.ERROR,e.getMessage());
+                statusManager.generateErrorLog(e.getMessage());
             } catch (RuntimeException e) {
-                statusManager.generateLog(LogType.ERROR, "Failed to apply config: " + e.getMessage());
+                statusManager.generateErrorLog("Failed to apply config: " + e.getMessage());
             }
             
         });
@@ -195,7 +186,7 @@ public class ServerConnectionService extends CommanderService{
             out.flush();
             return true;
         } catch (IOException e) {
-            statusManager.generateLog(LogType.ERROR, SENDING_ERROR + e.getMessage());
+            statusManager.generateErrorLog(SENDING_ERROR + e.getMessage());
             connected = false;
             return false;
         }

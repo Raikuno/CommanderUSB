@@ -1,9 +1,11 @@
 package com.usbcommander.managers;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.google.inject.Singleton;
 import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.Kernel32Util;
@@ -12,11 +14,13 @@ import com.sun.jna.platform.win32.WinBase;
 import com.sun.jna.platform.win32.WinNT;
 import com.sun.jna.ptr.IntByReference;
 import com.usbcommander.AppConst;
+import com.usbcommander.errors.UnallowedOperationException;
 import com.usbcommander.managers.contract.IUsbMemoryManager;
 
 /**
  * Implementación de IUsbMemoryManager para funcionar en un entorno de windows, mediante modificaciónes en el registro de windows y el uso de herramientas propias de este sistema operativo
  */
+@Singleton
 public class UsbMemoryManager extends IUsbMemoryManager{
 
     /**
@@ -24,45 +28,33 @@ public class UsbMemoryManager extends IUsbMemoryManager{
      */
     private final int IOCTL_STORAGE_EJECT_MEDIA = 0x2D4808;
 
-    private UsbMemoryManager(){
-
-    }
-
-    /**
-     * Método estático que construye una instancia de IUsbMemoryManager con la implementación definida en esta clase.
-     * @return La instancia almacenada en la clase abstracta, inicializada como objeto de esta clase
-     */
-    public static IUsbMemoryManager getInstance(){
-        if(instance == null){
-            instance = new UsbMemoryManager();
-        }
-        return instance;
-    }
-
     @Override
-    public List<Map<String, String>> getConnectedDrives(){
+    public List<Map<String, String>> getConnectedDrives() throws UnallowedOperationException{
         List<Map<String, String>> result = new ArrayList<>();
-        String[] driveLetters = Kernel32Util.getLogicalDriveStrings().toArray(new String[0]);
-        for (String value:driveLetters) {
+        String[] driveLetters = new String[0];
+        try{
+             driveLetters = Kernel32Util.getLogicalDriveStrings().toArray(new String[0]);
+                    for (String value:driveLetters) {
+                            if (Kernel32.INSTANCE.GetDriveType(value) == WinBase.DRIVE_REMOVABLE) {
+                                char[] volumeName  = new char[256];
+                                IntByReference serialNumber = new IntByReference();
 
-                if (Kernel32.INSTANCE.GetDriveType(value) == WinBase.DRIVE_REMOVABLE) {
-                    char[] volumeName  = new char[256];
-                    IntByReference serialNumber = new IntByReference();
+                                boolean success = Kernel32.INSTANCE.GetVolumeInformation(
+                                    value,
+                                    volumeName, 256,
+                                    serialNumber,
+                                    null, null,
+                                    null, 0
+                                );
 
-                    boolean success = Kernel32.INSTANCE.GetVolumeInformation(
-                        value,
-                        volumeName, 256,
-                        serialNumber,
-                        null, null,
-                        null, 0
-                    );
-
-                    if (success) {
-                        result.add(Map.of("DriveLetter", value.trim(), "Name", String.valueOf(volumeName).trim()));
+                                if (success) {
+                                    result.add(Map.of("DriveLetter", value.trim(), "Name", String.valueOf(volumeName).trim()));
+                                }
+                            }
                     }
-                }
+        } catch (Win32Exception e) {
+            throw new UnallowedOperationException("Failed to get connected drives " + e.getMessage());
         }
-
         return result;
     }
 
@@ -87,50 +79,60 @@ public class UsbMemoryManager extends IUsbMemoryManager{
     }
 
     @Override
-    public int getAccessValue(){
+    public int getAccessValue() throws UnallowedOperationException{
         String keyValue = "Start";
-        return Advapi32Util.registryGetIntValue(
-            AppConst.MAIN_LOCATION, 
-            AppConst.RegistryReferences.USB_STOR, 
-            keyValue);
+        try{
+            return Advapi32Util.registryGetIntValue(
+                AppConst.MAIN_LOCATION, 
+                AppConst.RegistryReferences.USB_STOR, 
+                keyValue);
+        }catch(Win32Exception err){
+            throw new UnallowedOperationException("Failed to get USB access value: " + err.getMessage());
+        }
         
     }
 
     @Override
-    public void enableAccess(){
+    public void enableAccess() throws UnallowedOperationException{
         String keyValue = "Start";
+        try{
         Advapi32Util.registrySetIntValue(
             AppConst.MAIN_LOCATION, 
             AppConst.RegistryReferences.USB_STOR, 
             keyValue, 
             AppConst.RegistryReferences.ENABLE_VALUE);
+        }catch(Win32Exception err){
+            throw new UnallowedOperationException("Failed to enable USB access: " + err.getMessage());
+        }
 
     }
 
     @Override
-    public void disableAccess(){
+    public void disableAccess() throws UnallowedOperationException{
         String keyValue = "Start";
-        Advapi32Util.registrySetIntValue(
+        try{
+            Advapi32Util.registrySetIntValue(
             AppConst.MAIN_LOCATION, 
             AppConst.RegistryReferences.USB_STOR, 
             keyValue, 
             AppConst.RegistryReferences.DISABLE_VALUE);
+        }catch(Win32Exception err){
+            throw new UnallowedOperationException("Failed to disable USB access: " + err.getMessage());
+        }
+        
     }
 
     
     @Override
-    public void removeExternalDrives(){
-        getConnectedDrives().stream()
-        .map((v) -> {
-            return v.get("DriveLetter");
-        })
-        .forEach((v) -> {
+    public void removeExternalDrives() throws UnallowedOperationException {
+        for (Map<String, String> drive : getConnectedDrives()) {
+            String driveLetter = drive.get("DriveLetter");
             try {
-                removeDrive(v);
+                removeDrive(driveLetter);
             } catch (Win32Exception e) {
-                System.err.println("Failed to eject drive " + v + ": " + e.getMessage());
+                throw new UnallowedOperationException( "Failed to eject drive " + driveLetter + ": " + e.getMessage());
             }
-        });
+        }
     }
 
     /**

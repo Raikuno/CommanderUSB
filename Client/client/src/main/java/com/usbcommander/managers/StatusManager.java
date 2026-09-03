@@ -2,13 +2,17 @@ package com.usbcommander.managers;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.sun.jna.platform.win32.Advapi32;
 import com.sun.jna.platform.win32.Win32Exception;
 import com.sun.jna.platform.win32.WinNT;
@@ -16,21 +20,16 @@ import com.sun.jna.platform.win32.Advapi32Util.EventLogIterator;
 import com.sun.jna.platform.win32.Advapi32Util.EventLogRecord;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.usbcommander.AppConst;
-import com.usbcommander.config.MachineConfig;
 import com.usbcommander.config.contract.IMachineConfig;
 import com.usbcommander.dto.LogDTO;
 import com.usbcommander.enums.LogType;
 import com.usbcommander.managers.contract.IStatusManager;
-import com.usbcommander.managers.contract.IUsbMemoryManager;
 
 /**
  * Implementación de IStatusManager para funciionarr en un entorno de windows haciendo uso del registro de windows y windows event viewer
  */
+@Singleton
 public class StatusManager extends IStatusManager{
-    /**
-     * Instancia de IUsbMemoryManager usada para obtener información del estado de la máquina
-     */
-    private IUsbMemoryManager usbMemoryManager;
     /**
      * Instancia de IMachineConfig para comparar el estado esperado de la máquina
      */
@@ -47,51 +46,38 @@ public class StatusManager extends IStatusManager{
     /**
      * Constructor de la clase en el que se inicializan las propiedades del objeto
      */
-    private StatusManager(){
-        usbMemoryManager = UsbMemoryManager.getInstance();
-        machineConfig = MachineConfig.getInstance();
+    @Inject
+    public StatusManager(IMachineConfig machineConfig){
         advapi32 = Advapi32.INSTANCE;
         mapper = new ObjectMapper().registerModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-    }
-
-    /**
-     * Método estático que construye una instancia de IStatusManager con la implementación definida en esta clase.
-     * @return La instancia almacenada en la clase abstracta, inicializada como objeto de esta clase
-     */
-    public static IStatusManager getInstance(){
-        if(instance == null){
-            instance = new StatusManager();
-        }
-        return instance;
+        this.machineConfig = machineConfig;
     }
 
     @Override
-    public LogDTO generateLog(){
+    public LogDTO generateLog(int usbAccessValue, List<Map<String, String>> connectedDrives){
         Optional<LogType> type = Optional.empty();
-        if(machineConfig.isUsbEnable() && usbMemoryManager.getAccessValue()==AppConst.RegistryReferences.ENABLE_VALUE){
+        if(machineConfig.isUsbEnable() && usbAccessValue==AppConst.RegistryReferences.ENABLE_VALUE){
             type = Optional.of(LogType.INCOHERENT);
         }
 
-        if(usbMemoryManager.isDriveConnected()>0){
+        if(!connectedDrives.isEmpty()){
             type = Optional.of(LogType.MEMORY_CONN);
-            usbMemoryManager.removeExternalDrives();
         }
 
         if(type.isEmpty()){
             type = Optional.of(LogType.INFO);
         }
 
-        return generateLog(type.get());
-    }
-
-
-    @Override
-    public LogDTO generateLog(LogType type){
-        return generateLog(type, "");
+        return generateLog(type.get(), "", usbAccessValue, connectedDrives);
     }
 
     @Override
-    public LogDTO generateLog(LogType type, String message){
+    public LogDTO generateErrorLog(String message){
+        return generateLog(LogType.ERROR, message, -1, Collections.emptyList()); 
+    }
+
+    @Override
+    public LogDTO generateLog(LogType type, String message, int usbAccessValue, List<Map<String, String>> connectedDrives){
         LogDTO log;
         String logJson;
         int winType;
@@ -100,9 +86,9 @@ public class StatusManager extends IStatusManager{
         } else {
             try{
                 log = new LogDTO(
-                    usbMemoryManager.getAccessValue(), 
+                    usbAccessValue, 
                     machineConfig.isUsbEnable(), 
-                    usbMemoryManager.getConnectedDrives(), 
+                    connectedDrives,
                     LocalDateTime.now(),
                     type.getCode()
                 );
@@ -238,10 +224,10 @@ public class StatusManager extends IStatusManager{
         try{
             boolean success = advapi32.ClearEventLog(handle, null);
             if(!success){
-                generateLog(LogType.ERROR, AppConst.ErrorMessages.ERROR_DELETE);
+                generateErrorLog(AppConst.ErrorMessages.ERROR_DELETE);
             }
         }catch(Win32Exception e){
-            generateLog(LogType.ERROR, AppConst.ErrorMessages.ERROR_DELETE + e.getMessage());
+            generateErrorLog(AppConst.ErrorMessages.ERROR_DELETE + e.getMessage());
         } finally{
             advapi32.CloseEventLog(handle);
         }

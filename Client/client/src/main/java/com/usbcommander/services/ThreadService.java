@@ -1,60 +1,62 @@
 package com.usbcommander.services;
-
-import com.usbcommander.config.MachineConfig;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
 import com.usbcommander.config.contract.IMachineConfig;
-import com.usbcommander.enums.LogType;
 import com.usbcommander.errors.ServiceDisabledException;
-import com.usbcommander.managers.StatusManager;
+import com.usbcommander.errors.UnallowedOperationException;
 import com.usbcommander.managers.contract.IStatusManager;
+import com.usbcommander.managers.contract.IUsbMemoryManager;
 import com.usbcommander.services.contract.CommanderService;
 
 /**
  * Servicio encargado de lanzar y controlar el estado de otros servicios
  */
+@Singleton 
 public class ThreadService extends CommanderService{
-    /**
-     * Instancia del servicio
-     */
-    private static ThreadService instance;
     /**
      * Instancia de IMachineConfig usada para habilitar la conexión con el servidor
      */
-    private IMachineConfig machineConfig;
+    private final IMachineConfig machineConfig;
     /**
      * Instacía de IStatusManager usada para generar una entrada de registro al iniciar la aplicación
      */
-    private IStatusManager statusManager;
+    private final IUsbMemoryManager usbMemoryManager;
+    private final IStatusManager statusManager;
+    private final Provider<SecurityService> securityServiceProvider;
+    private final Provider<LogService> logServiceProvider;
+    private final Provider<ServerConnectionService> serverConnectionServiceProvider;
 
-    /**
-     * Método estático usado para inicializar y obtener la instancia de este servicio
-     * @return La instancia inicializada del Servicio
-     */
-    public static ThreadService getInstance(){
-        if(instance == null){
-            instance = new ThreadService();
-        }
-        return instance;
+    @Inject 
+    public ThreadService(IMachineConfig machineConfig,
+                         IStatusManager statusManager,
+                         Provider<SecurityService> securityServiceProvider,
+                         Provider<LogService> logServiceProvider,
+                         Provider<ServerConnectionService> serverConnectionServiceProvider,
+                         IUsbMemoryManager usbMemoryManager){
+        this.machineConfig = machineConfig;
+        this.statusManager = statusManager;
+        this.securityServiceProvider = securityServiceProvider;
+        this.logServiceProvider = logServiceProvider;
+        this.serverConnectionServiceProvider = serverConnectionServiceProvider;
+        this.usbMemoryManager = usbMemoryManager;
     }
-
-    /**
-     * Constructor encargado de inicializar las propiedades del objeto
-     */
-    private ThreadService(){
-        this.machineConfig = MachineConfig.getInstance();
-        this.statusManager = StatusManager.getInstance();
-        machineConfig.enableServerService();
-    } 
 
     @Override
     public void run() {
-        statusManager.generateLog();
-        SecurityService.getInstance().start();
-        LogService.getInstance().start();
-        ServerConnectionService.getInstance().start();
+        machineConfig.enableServerService();
+        try{
+            statusManager.generateLog(usbMemoryManager.getAccessValue(), usbMemoryManager.getConnectedDrives());
+        } catch (UnallowedOperationException e) {
+            statusManager.generateErrorLog(e.getMessage());
+        }
+        securityServiceProvider.get().start();
+        logServiceProvider.get().start();
+        serverConnectionServiceProvider.get().start();
         try {
-            SecurityService.getInstance().forceClose();
+            securityServiceProvider.get().forceClose();
         } catch (ServiceDisabledException e) {
-            statusManager.generateLog(LogType.ERROR, e.getMessage());
+            statusManager.generateErrorLog(e.getMessage());
         }
         while (running);
     }

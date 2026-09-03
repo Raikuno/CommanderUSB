@@ -5,11 +5,6 @@ package com.usbcommander.config.contract;
  */
 public abstract class IMachineConfig {
     /**
-     * Almacena la instancia de configuración usada en la aplicación. Este será inicializado por las clases que definan los métodos de la clase abstracta
-     */
-    protected static IMachineConfig instance;
-    
-    /**
      * Este método guarda la configuración actualmente en memoria
      * @return
      */

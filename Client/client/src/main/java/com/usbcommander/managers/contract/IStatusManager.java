@@ -1,6 +1,7 @@
 package com.usbcommander.managers.contract;
 
 import java.util.List;
+import java.util.Map;
 
 import com.usbcommander.dto.LogDTO;
 import com.usbcommander.enums.LogType;
@@ -11,24 +12,10 @@ import com.usbcommander.enums.LogType;
 public abstract class IStatusManager {
 
     /**
-     * Almacena la instancia de la clase usada en la aplicación. Este será inicializado por las clases que definan los métodos de la clase abstracta
-     */
-    protected static IStatusManager instance;
-
-    protected IStatusManager(){}
-
-    /**
      * Método utilizado para generar y almacenar un registro automáticamente, evaluando el estado de la máquina y su estado esperado/deseado
      * @return El registro generado
      */
-    public abstract LogDTO generateLog();
-
-    /**
-     * Método utilizado para generar y almacenar un registro en función de un tipo definido
-     * @param type El tipo del registro a crear
-     * @return El registro generado
-     */
-    public abstract LogDTO generateLog(LogType type);
+    public abstract LogDTO generateLog(int usbAccessValue, List<Map<String, String>> connectedDrives);
 
     /**
      * Método utilizado para generar y almacenar un registro en función de un tipo definido y un mensaje específico. utilizado específicamente para los registros de error
@@ -36,7 +23,9 @@ public abstract class IStatusManager {
      * @param message El mensaje a almacenar en el registro
      * @return El registro generado
      */
-    public abstract LogDTO generateLog(LogType type, String message);
+    public abstract LogDTO generateLog(LogType type, String message, int usbAccessValue, List<Map<String, String>> connectedDrives);
+
+    public abstract LogDTO generateErrorLog(String message); 
 
     /**
      * Método utilizado para obtener todos los registros almacenados

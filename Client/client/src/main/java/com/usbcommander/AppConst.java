@@ -41,5 +41,6 @@ public class AppConst {
         public static final String LOG_GENERATION_ERROR = "Couldn't read machine information, log values couldn't be set. Error Info: ";
         public static final String ERROR_DELETE = "Error deleting event log history. Error Info: ";
         public static final String WEIRDVALUE_ERROR = "WeirdValue found while parsing logs. Error Info: ";
+        public static final String UNSUPPORTED_OS_ERROR = "The current OS is not supported";
     }
 }
