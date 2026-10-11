@@ -1,108 +1,108 @@
 [volver](./README.md)
-# Uso
-Una vez instalada la aplicación de servidor, se mostrará una página de creación de usuario al acceder a la página principal:
+# Usage
+Once the server application is installed, a user creation page will be displayed when you access the main page:
 ![container_use_3](./server_images/server_image_3.png)
-Esta página solo se mostrará si la aplicación detecta que no existen cuentas almacenadas en la base de datos, y solo será accesible bajo estas circunstancias. Una vez introducidos los datos se dirigirá a la página de inicio de sesión.
+This page will only be shown if the application detects that there are no accounts stored in the database, and it will only be accessible under these circumstances. Once the data is entered, the user will be redirected to the login page.
 ![server_1](./server_images/server_image_4.png)
 <br><br>
-Una vez se haya iniciado sesión, se mostrará la página princiipal de la aplicación, esta mostrará una serie de elementos que variará en función de los permisos del usuario que haya iniciado sesión.
+After logging in, the main page of the application will be shown. This page displays a series of elements that vary depending on the permissions of the user who has logged in.
 ![server_2](./server_images/server_image_5.png)
 
-## Página principal
-Desde esta página tendremos acceso al navbar en el que se encuentran enlaces a todas las páginas de la aplicación, siendo estas las páginas relacionadas a la administración de cuentas, la página de administración de máquinas, la página de administración de registros y las opciones de cuenta de usuario.
-Además del navbar, como se puede ver en la anteerior imagen, se muestra un elemento que mostrará aquellas máquinas que requieran de una revisión, es decir, que esten relaciionadas a un registro de un tipo que se denomine que necesite revisión.
+## Main page
+From this page, we will have access to the navbar, which contains links to all pages of the application, including the account management pages, the machine management page, the log management page, and the user account options.
+In addition to the navbar, as seen in the previous image, there is an element that shows the machines that require review, meaning those associated with a log type that is classified as needing review.
 ![server_3](./server_images/server_image_6.png)
-La tarjeta que se muestra será únicamente informativa, mostrando el nombre y la ip de la máquina que rerquiere revisión, sin embargo, para acceder a la información del registro o de la máquina, será necesario navegar a la página pertinente.
+The card displayed is purely informational and shows the name and IP of the machine that requires review. However, to access the log or machine information, it is necessary to navigate to the relevant page.
 
-## Páginas de administración de usuario
-Al hacer clic en la opción de cuentas del menú de navegación se mostrarán tres opciones: Usuarios, Roles y Permisos
+## User management pages
+By clicking on the Accounts option in the navigation menu, three options will be displayed: Users, Roles, and Permissions.
 ![server_4](./server_images/server_image_7.png)
-La primera opción redirige a la página de administración de usuarios, en ella, además de poder acceder a las otras dos páginas, se ofrecen las opciones de creación, edición, desactivación y activación de cuentas de usuario
+The first option redirects to the user management page, where, in addition to being able to access the other two pages, the user can create, edit, disable, and enable accounts.
 ![server5](./server_images/server_image_8.png)
-Si se desactiva una cuenta, esta no podrá ser usada, por lo que se debe procurar no desactivar la cuenta de usuario administrador para evitar problemas.
-Al clicar en el botón de nuevo usuario, se redirigirá a un formulario en el que se deberán insertar las credenciales del usuario a crear: 
+If an account is disabled, it cannot be used, so care should be taken not to disable the administrator account to avoid problems.
+When clicking the New User button, a form will open where the credentials for the user to be created must be entered:
 ![server_6](./server_images/server_image_9.png)
 ![server_7](./server_images/server_image_10.png)
-Un detalle importante es que un usuario puede ser creado sin roles, pero al no tener asignado ningún rol, solo podrá acceder a la página de inicio.<br>
-A la hora de editar a un usuario, por cuestiones de seguridad, no se permitirá alterar la contraseña de este
+An important detail is that a user can be created without roles, but if no role is assigned, they will only be able to access the home page.<br>
+When editing a user, for security reasons, it will not be allowed to change that user's password.
 <br><br>
-Al acceder a la páginna de roles, se nos mostrarán todos los roles creados, por defecto, la aplicacion unicamente crea el rol de ADMIN, con todos los permisos.
+By accessing the roles page, all created roles will be shown. By default, the application only creates the ADMIN role, which has all permissions.
 ![server_8](./server_images/server_image_11.png)
-Desde esta página, se puede además, crear y editar roles. A la hora de crear o editar un rol, se dirigirá a un formulario que mostrará los permisos almacenados en la base de datos y un campo para nombrar el rol.
+From this page, it is also possible to create and edit roles. When creating or editing a role, a form will be displayed showing the permissions stored in the database and a field to name the role.
 ![serve_9](./server_images/server_image_12.png)
 ![serve_10](./server_images/server_image_13.png)
-Por supuesto, este nuevo rol podrá ser asignado a un usuario, proporcionandole los permisos asignados:
+Of course, this new role can be assigned to a user, granting them the corresponding permissions:
 ![serve_11](./server_images/server_image_14.png)
 ![serve_12](./server_images/server_image_15.png)
 <br><br>
-La última página relacionada a la administración de cuentas de usuario es la página de permisos, en ella se muestran todos los permisos ofrecidos por la aplicación.
+The last page related to user account management is the permissions page, which shows all permissions offered by the application.
 ![serve_13](./server_images/server_image_16.png)
-Estos permisos son creados al iniciar la base de datos con el script pertinente, y debido a la forma en la que se estructura la aplicación, no es posible añadir o alterar el funcionamiento de estos sin modificar el código.
-A continuación se muestra una descripción de las acciones que permiten realizar los permisos:
+These permissions are created when the database is initialized with the relevant script, and because of the way the application is structured, it is not possible to add or change their behavior without modifying the code.
+Below is a description of the actions allowed by the permissions:
 <table>
     <tr>
         <th>MACHINE_MANAGEMENT</th>
-        <td>Permite acceder a las páginas y realizar peticiones a los endpoints dedicados a mostrar y modificar las máquinas</td>
+        <td>Allows access to pages and requests to the endpoints dedicated to displaying and modifying machines</td>
     </tr>
         <tr>
         <th>MANAGE_ROLES</th>
-        <td>Permite acceder a las páginas y realizar peticiones a los endpoints que permiten crear, ver y modificar roles</td>
+        <td>Allows access to the pages and endpoints that permit creating, viewing, and modifying roles</td>
     </tr>
         <tr>
         <th>SOLVE_LOGS</th>
-        <td>Permite acceso a las páginas y realizar peticiones a los endpoints dedicados a marcar registros como resueltos</td>
+        <td>Allows access to the pages and endpoints dedicated to marking records as resolved</td>
     </tr>
         <tr>
         <th>USER_MANAGEMENT</th>
-        <td>Permite acceder a las páginas y realizar peticiones a los endpoints dedicados a crear y modificar usuarios</td>
+        <td>Allows access to the pages and endpoints dedicated to creating and modifying users</td>
     </tr>
         <tr>
         <th>VIEW_LOGS</th>
-        <td>Permite acceder a las páginas y realizar peticiones a los endpoints dedicados a mostrar los registros y sus detalles</td>
+        <td>Allows access to the pages and endpoints dedicated to showing logs and their details</td>
     </tr>
 </table>
 
-## Páginas relacionadas a las máquinas
-Al acceder a la página de maquinas del menú de navegación, se nos mostrará un grid con todas las máquinas almacenadas en la base de datos. Además, en función de su estado, la tarjeta de la máquina cambiara, apareciendo blanca si no requiere de revisión, amarilla si requiere de revisión y roja si requiere de revisión urgente. Ademáß, se marcará con una etiqueta si está conectada o no.
+## Machine-related pages
+By accessing the Machines page from the navigation menu, a grid with all machines stored in the database will be displayed. In addition, depending on the machine state, the card will change color: white if it does not require review, yellow if it requires review, and red if it requires urgent review. A label will also indicate whether it is connected or not.
 ![server_14](./server_images/server_image_17.png)
-Además de las máquinas, también se puede encontrar un formulario con opciones de filtrado en el caso de que sea necesario encontrar una máquina concreta. El formulario permite:
-- Buscar por nombre
-- Buscar por ip
-- Mostrar máquinas deshabilitadas
-- Mostrar solo las máquinas conectadas
-- Mostrar solo las máquinas que requieran revisión
+In addition to the machines, there is also a filter form that can be used to find a specific machine when needed. The form allows:
+- Search by name
+- Search by IP
+- Show disabled machines
+- Show only connected machines
+- Show only machines that require review
 
 ![server_15](./server_images/server_image_18.png)
 <br><br>
 
-Al clicar en una de las tarjetas, se mostrará la información de la máquina. En esta página se puede ver la frecuencia de los registros regulares, la fecha de registro, la descripción, el nombre, la ip y los registros de la máquina, divididos en dos pestañas. Además, también se muestra un formulario que permite alterar la configuración de la máquina si esta esta conectada.
+By clicking on one of the cards, the machine information will be displayed. On this page, it is possible to see the frequency of regular logs, the registration date, description, name, IP, and the machine logs divided into two tabs. In addition, a form is shown that allows changing the machine configuration if it is connected.
 ![server_16](./server_images/server_image_19.png)
 ![server_17](./server_images/server_image_20.png)
 
-Al lado del campo de descripción y nombre se muestran botones de editar, que permiten entrar en un modo edición para alterar estos campos.
-Si se desean ver los detalles de uno de los registros de la máquina, esto se puede hacer clicando el botón peertinente en el registro que se desea ver. Al hacerlo se mostrará una página con la información del registro y, si fuese posible, un botón con la opción de marcar el registro como revisado.
+Next to the description and name fields, edit buttons are shown, allowing the user to enter an editing mode to modify these fields.
+If you want to view the details of one of the machine's logs, click the relevant button on the record you want to inspect. Doing so will display a page with the log information and, if possible, a button to mark the log as reviewed.
 ![server_18](./server_images/server_image_21.png)
-Tras marcar un registro como revisado, el color de este pasará a ser verde, y el color del icono de la máquina pasara se ajustará al del registro de mayor gravedad sin revisar.
+After marking a record as reviewed, its color changes to green, and the machine icon color adjusts to match the highest-priority unresolved log.
 ![server20](./server_images/server_image_22.png)
 ![server19](./server_images/server_image_23.png)
 
-## Páginas relacionadas a los registros
-La tercera opción mostrada en la barra de navegación, permite acceder a una lista de los registros que requieren de revisión de todas las máquinas almacenadas en la base de datos.
+## Log-related pages
+The third option in the navigation bar allows access to a list of all logs requiring review from all machines stored in the database.
 ![server21](./server_images/server_image_24.png)
 
-Desde esta página se pueden ver los detalles de un registro, la máquina de la que proviene el registro o, se pueden validar un conjunto de registros al mismo tiempo marcándolos individualmente o marcando la opción de marcarlos todos, y clicando el botón de "marcar como revisado".
+From this page, it is possible to view the details of a log, the machine from which it came, or validate multiple logs at once by selecting them individually or choosing the option to select all and then clicking the "mark as reviewed" button.
 ![server22](./server_images/server_image_25.png)
 ![server23](./server_images/server_image_26.png)
 
-## Páginas relacionadas con los ajustes de la cuenta
-Las páginas relacionadas a las acciones de la cuenta de usuario pueden ser accedidas desde el icono de usuario de la barra de navegación.
+## Account settings pages
+The pages related to user account actions can be accessed from the user icon in the navigation bar.
 ![server24](./server_images/server_image_27.png)
-La primera de esttas opciones redirigirá a un formularrio en el que se podrá cambiar la contraseña tras introducir la actual
+The first option redirects to a form where the password can be changed after entering the current one.
 ![server25](./server_images/server_image_28.png)
 ![server26](./server_images/server_image_29.png)
-Al cambiar la contraseña todas las sesiones asignadas al usuario (refresh tokens) serán marcadas como invalidas, por lo que al momento de caducar el access token del usuario, se le pedirá que inicie sesión de nuevo.
+When the password is changed, all sessions assigned to the user (refresh tokens) are marked invalid, so when the user's access token expires, they will be asked to log in again.
 
-La segunda opción, sirve para cerrar sesión, "eliminando" las cookies con los tokens del usuario.
+The second option logs the user out by "removing" the cookies with the user tokens.
 
-## Conexión con máquinas cliente
-Al momento de iniciar el servidor, al mismo tiempo, se iniciará un hilo adicional encargado de configurar un server socket que aceptará cualquier máquina que trate de conectarse al servidor, registrandola en caso de que no lo este ya, siendo la única formma de evitar una conexión con una máquina cliente, el bloqueo de esta emmdiante la propia interfaz. Esto es, por supuesto, una vulnerabilidad severa en la aplicación, sin embargo, debido a diferentes problemas surgidos durante el desarrollo de la aplicación y falta de tiempo, no se ha podido configurar la seguridad necesaria en esta conexión. En un futuro se pretende configurar un sistemma de autenticación mediante certificados mTLS, lo que tambien permitiría conexiones de máquinas externas a la red.
+## Connection with client machines
+When the server starts, an additional thread is also started to configure a server socket that accepts any machine attempting to connect to the server, registering it if it is not already registered. The only way to prevent a connection from a client machine is to block it through the interface itself. This is, of course, a serious vulnerability in the application. However, due to different problems encountered during development and a lack of time, the necessary security could not be implemented for this connection. In the future, it is planned to implement an authentication system based on mTLS certificates, which would also allow connections from machines outside the network.

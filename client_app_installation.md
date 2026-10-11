@@ -1,30 +1,30 @@
-# Requerimientos
-La aplicación de cliente necesita ser instalada en los equipos de los que se desea llevar el seguimiento. Para esta tarea se ha construido una aplicación dedidaca a preparar el entorno necesario para que la aplicación de cliente puede ejecutarse de manera correcta. Gracias a jpackage, la aplicación ha sido empaquetada de tal forma que no requiere de una instalación de java para poder funcionar, sin embargo, debido a limitaciones de tiempo, no ha sido posible configurar la aplicación para poder conectarse desde redes externas, por lo que para asegurar el correcto funcionamiento de la aplicación, se necesita que el cliente se encuentre en la misma red que el servidor.<br>
-Con respecto a los requisitos del sistema, la aplicación de cliente requerira que el equipo cuente con las siguientes especificaciones:
+# Requirements
+The client application needs to be installed on the computers that are to be monitored. For this task, a dedicated application has been built to prepare the environment required for the client application to run correctly. Thanks to jpackage, the application has been packaged so that it does not require a Java installation to run. However, due to time limitations, it was not possible to configure the application to connect from external networks, so to ensure correct operation, the client must be on the same network as the server.<br>
+Regarding system requirements, the client application requires the computer to meet the following specifications:
 - Windows 10/11
-- CPU x64 bits
-- 300 MB de ram dedicados a la aplicación
-- Dirección ip estática configurada
+- x64 CPU
+- 300 MB of RAM dedicated to the application
+- Static IP address configured
 
 
-# Instalación
-Como ya se ha mencionado, para poder ejecutar la aplicación correctamente, se debe hacer uso del instalador proporcionado. El uso de este es extremadamente sencillo. La única información a tener en cuenta es la ip y el puerto del socket del servidor. A continuación se muestran los pasos a seguir para la instalación: 
-1. Se debe abrir la aplicación UsbCommanderInstaller con permisos de administrador. Tras ello se mostrará una ventana que preguntará por la ip del servidor:
+# Installation
+As mentioned above, to run the application correctly, the provided installer must be used. Its use is extremely simple. The only information to keep in mind is the server IP address and socket port. The steps to install it are as follows:
+1. Open the UsbCommanderInstaller application with administrator permissions. After that, a window will appear asking for the server IP address:
 ![installer_1](./client_images/client_image_1.png)
 
-2. Introducimos la ip, tras lo que nos preguntará por el puerto que también deberemos introducir:
+2. Enter the IP address, after which it will ask for the port, which must also be entered:
 ![installer_2](./client_images/client_image_2.png)
 
-3. Tras esto la aplicación comenzará a instalarse, creando las entradas en el registro de windows para almacenar su configuración, creando el canal para emitir los logs en el visor de eventos de windows, moviendo la carpeta con los archivos de la aplicación a la carpeta de programas instalados de windows y preparando una tarea del administrador de tareas que permitirá iniciar la aplicación con permisos de administrador al momento de iniciar el sistema operativo.
+3. After that, the application will begin installing, creating the Windows registry entries to store its configuration, creating the channel to emit logs in the Windows Event Viewer, moving the folder with the application files to the Windows installation folder, and preparing a task in Task Scheduler that will allow the application to start with administrator permissions when the operating system starts.
 ![installer_3](./client_images/client_image_3.png)
 
-4. Al finalizar, el instalador se cerrará. Una vez reiniciado el ordenador, la aplicación comenzará a ejecutarse en segundo plano, sin embargo, se recomienda llevar a cabo la instalación y preparación de la aplicación del servidor antes de iniciar la aplicación de cliente.
+4. At the end, the installer will close. Once the computer is restarted, the application will begin running in the background. However, it is recommended to complete the installation and preparation of the server application before starting the client application.
 
-De manera alternativa, se puede saltar esta instalación haciendo uso de los parámetros ```--ip``` y ```--port``` al ejecutar el instalador por linea de comando:
+Alternatively, the installation can be skipped by using the `--ip` and `--port` parameters when executing the installer from the command line:
 ![installer_4](./client_images/client_image_4.png)
 
-Para desinstalar la aplicación, bastará con abrir de nuevo el instalador. Este detectará automáticamente si hay algun resto de instalación previa de USBCommander (entradas de registro, archivos de la aplicación, etc) y ofrecerá la posibilidad de desinstalar la aplicación. También se puede desinstalar haciendo uso del parámetro -u al momento de ejecutar el instalador por linea de comando:
+To uninstall the application, simply open the installer again. It will automatically detect whether any previous USBCommander installation remains (registry entries, application files, etc.) and will offer the option to uninstall the application. It can also be uninstalled by using the `-u` parameter when running the installer from the command line:
 ![installer_5](./client_images/client_image_5.png)
 ![installer_6](./client_images/client_image_6.png)
 
-Al momento de desinstalar la aplicación, se borrarán todas las entradas de registro relacionadas con la aplicación, asi como los archivos. Además, se configurará para habilitar la posibilidad de conectar memorias usb nuevamente al equipo.
+When uninstalling the application, all registry entries related to the application will be removed, along with the files. In addition, the system will be configured to re-enable the ability to connect USB drives to the computer.

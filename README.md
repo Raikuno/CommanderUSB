@@ -1,5 +1,6 @@
 [![CC BY 4.0][cc-by-shield]][cc-by]
-# Usb Commander
+# CommanderUSB
+> Remote monitoring and control of USB flash drives
 This work is licensed under a
 [Creative Commons Attribution 4.0 International License][cc-by].
 
@@ -9,25 +10,57 @@ This work is licensed under a
 [cc-by-image]: https://i.creativecommons.org/l/by/4.0/88x31.png
 [cc-by-shield]: https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg
 
-La finalidad de este proyecto es la de ofrecer un sistema de supervisión y un cierto grado de control para aquellos equipos que, 
-ya sea por contener información sensible o por cualquier otro motivo, no se desee que se permita una conexión USB con dispositivos de almacenamiento externo.
+## What it is
+This project consists of a pair of applications that allow users to observe and control access to USB flash drives on a specific machine or machines in a network through a control panel from a remote computer.
 
-El principio fundamental sobre el que trabaja esta aplicación es que cualquiera que realmente busque saltarse una medida de seguridad, terminará lograndolo, por ello, USB Commander se centra en ofrecer una forma rápida, sencilla y efectiva para conocer el estado de las unidades de memoria USB conectadas a las máquinas contraladas por la aplicación, o si se encuentra una unidadUSB conectada en primer lugar.
+The applications that make this project work are the client and server applications.
 
-## Estructura
-USB Commander se divide en dos aplicaciones:
-- **Cliente**: Como su nombre indica, esta aplicación se instala en aquellos ordenadores a los que se quiera iniciar el seguimiento y se encargará de enviar la información a la aplicación de servidor. A pesar de ser USB Commander una aplicación dedicada a la supervisión, la aplicación de cliente ofrece medidas de seguridad para proteger el sistema, bloqueando el montaje de memoriass usb y desmontando aquellas que se detecten montadas.
-- **Servidor**: Esta aplicación será la que deba ejecutarse en el equipo que hara de servidor. El servidor se encargará de recibir la información de estado de las aplicaciones de cliente, además de mostrarla en una interfaz web. La aplicación de servidor ofrece un sistema de cuentas que permite dividir tareas en diferentes cuentas llevadas por diferentes personas, que podrán trabajar de forma simultanea mediante la interfaz web que ofrece la aplicación.
-<br>
+### Client
+```
+At this moment, the client application is only compatible with Windows 10/11 systems.
+```
+The client application needs to be installed through the dedicated installer, and it will run in the background, sending information to the server application. The information sent includes:
+- Date of the report
+- Whether USB flash drives are allowed on the machine
+- Whether the machine can mount USB flash drives automatically
+- A list of the USB flash drives connected to the machine, if any
 
-#
+The client application will also interpret the information sent by the server application, enabling or disabling USB flash drive access on the machine and changing configuration parameters. It also includes security measures so that if a parameter is changed without authorization, it will block USB access, unmount all USB flash drives currently mounted, and send information to the server application about the modification and the machine status.
+Once installed, the client application will launch automatically when the machine starts.
 
-En el caso de que se desee modificar el código de la aplicación, en la carpeta de `Documentation` se encuentra la documentación del código de la aplicación de cliente y servidor en formato pdf y html.
+### Server
+The server application is a web application that must be installed on a machine connected to the same network as the client machines. It receives and stores the information sent by the client applications in a MariaDB database that must have been created beforehand.
+The server application also acts as a control panel for the machines with the client app installed. It includes an account and role system so that the control panel is accessible from a remote device only by users previously registered by an administrator account.
+
+The server application will also allow users to:
+- View the information stored in the database
+- Open USB access on a machine for a limited time
+- Close USB access on a machine
+- View suspicious activity and identify which machine it came from
+
+```
+At this moment, the only way to connect a client to the server from an outside network would be through a VPN, but this has not been tested and could cause errors. This is because the IP used by the socket connection is used as the client identifier. This will be changed in a future release.
+```
+
+# Purpose
+This project was created to offer a free and secure surveillance and security system that is relatively easy to install for those who cannot implement a similar solution, since there is no free open-source application that offers a centralized way to monitor and control the use of USB drives.
+This application is designed to help those who need a way to prevent data leaks or situations like "it works on my machine, so let me copy the files and paste them onto yours," because in many cases this can create far more problems in the long run than spending a few minutes to understand and fix the real issue.
+
+# Planned features
+- mTLS encrypted communication
+- Make the client application's presence more noticeable to the user (taskbar icons and warning/alert dialogs)
+- Mail system for suspicious activity detection
+- Rework and improve the account role system
+- Default front-end migration to Angular
+- Client app optimization
+- Cross-platform support
+
+Although I want this project to be a functional, secure, and valid application on its own, it is still open source, so if you feel capable, please feel free to use it as a base to create a version that better fits your needs.
 <br><br>
-- [Instalación de la aplicación de servidor](./server_app_installation.md)
-- [Uso de la aplicación de servidor](./server_app_usage.md)
+- [Server app installation](./server_app_installation.md)
+- [How to use the server app](./server_app_usage.md)
 <br>
 
-- [Instalación de la aplicación de cliente](./client_app_installation.md)
-- [Uso de la aplicación de cliente](./client_app_usage.md)
+- [Client app installation](./client_app_installation.md)
+- [Client app usage](./client_app_usage.md)
 

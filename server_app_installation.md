@@ -1,52 +1,52 @@
 [volver](./README.md)
-# Requerimientos
-La aplicación de servidor se encarga de ofrecer una interfaz con la que interactuar con las máquinas y la información almacenada en la base de datos, de la cuál, la aplicacióñ de servidor también se encargará de administrar.
-Para poder ejecutar la aplicación de servidor, hará falta un entorno capáz de ejecutar aplicaciones de java 17, pues la aplicación se ofrece como formato .jar. Además, será necesario construir previamente una base de datos de mariadb con la estructura y los valores descritos en el script de creación, pues la aplicación necesita poder acceder a la base de datos para iniciar correctamente.
-Sumado a lo anterior, se necesitarán las siguientes especificaciones técnicas, suponiendo que tanto la base de datos como la aplicación vayan a ejecutarse en la misma máquina:
-- 1.5 GB de ram
-- Espacio libre recomendado mayor a 10GB
-- CPU de 2 cores como mínimo
-- Se recomienda linux como sistema operativo
+# Requirements
+The server application is responsible for providing an interface for interacting with machines and the information stored in the database, which the server application will also manage.
+To run the server application, it is necessary to have an environment capable of executing Java 17 applications, since the application is distributed as a .jar file. In addition, it is necessary to create a MariaDB database in advance with the structure and values described in the creation script, because the application must be able to access the database in order to start correctly.
+In addition to the above, the following technical specifications are required, assuming that both the database and the application will run on the same machine:
+- 1.5 GB of RAM
+- Recommended free space greater than 10 GB
+- Minimum 2-core CPU
+- Linux is recommended as the operating system
 
-# Instalación
-La aplicación puede ejecutar desde el archivo .jar directamente siempre y cuando se haya instalado java 17 y se haya iniciado la base de datos de mariadb, sin embargo, es necesario configurar ciertas variables de entorno para permitir a la aplicación ejecutar correctamente: 
+# Installation
+The application can be run directly from the .jar file as long as Java 17 has been installed and the MariaDB database has been started. However, it is necessary to configure certain environment variables to allow the application to run correctly:
 
-- COOKIE_SECURE: Deberá ser configurada con un valor de 'true' o 'false', en función de si se va a desplegar la applicación en un entorno de producción o no, pues habilitar la opción forzará la necesidad de un certificado ssl enn la página para permitir el almacenaje y lecturas de cookies de inicio de sesión
+- COOKIE_SECURE: Must be set to 'true' or 'false' depending on whether the application will be deployed in a production environment or not, because enabling this option requires an SSL certificate on the page to allow the storage and reading of login cookies.
 
-- DATABASE_URL: Dirección en la que se aloja la base de datos de maria_db.
+- DATABASE_URL: Address where the MariaDB database is hosted.
 
-- MARIADB_USER: usuario de la base de datos
+- MARIADB_USER: Database user
 
-- MARIADB_PASSWORD: contraseña del usuario de la base de datos
-- SOCKET_PORT: Puerto a dedicar en la conexión por socket dedicada a las aplicaciones de cliente
-- JWT_SECRET: Clave a utilizar para la generación de los jwt que permitirán el acceso de los usuarios registrados.
-- REFRESH_TOKEN_LIFE: El tiempo de vida en segundos del token que se utilizará para generar los access token de los usuarios.
+- MARIADB_PASSWORD: Database user password
+- SOCKET_PORT: Port to dedicate to the socket connection used by the client applications
+- JWT_SECRET: Key used to generate JWTs that allow access for registered users.
+- REFRESH_TOKEN_LIFE: Lifetime in seconds of the token used to generate the users' access tokens.
 
-- ACCESS_TOKEN_LIFE: El tiempo de vida en segundos del token que se usará para acceder a una cuenta.
+- ACCESS_TOKEN_LIFE: Lifetime in seconds of the token used to access an account.
 
-- LOG_ROUTE: Ruta en la que se generarán registros de errores ocurridos en las conexiones con las aplicaciones de clientes.
+- LOG_ROUTE: Path where error logs from client application connections will be generated.
 
-Para facilitar la tarea a la hora de ejecutar la aplicación, se proporciona una carpeta con la aplicación, una imagen de docker, un archivo de configuración de nginx, el script de la base de datos, un archivo .env con variables de ejemplo y un archivo docker_compose, de tal forma que bastará con tener docker o docker-compose instalado, y usar el comando `docker compose up -d` o `docker-compose up -d` en función de la versión descargada, para poder ejecutar un entorno con la aplicación de servidor. El archivo de docker compose hace uso de variables de entorno adicionales:
+To make the task easier when running the application, a folder with the application, a Docker image, an NGINX configuration file, the database script, an .env file with example variables, and a docker-compose file are provided. This means it is enough to have Docker or Docker Compose installed and run the command `docker compose up -d` or `docker-compose up -d`, depending on the version downloaded, to start an environment with the server application. The Docker Compose file uses additional environment variables:
 
-- DATABASE_ROOT_PASSWORD: Contraseña de usuario root de mariadb
-- USBCOMMANDER_DATABASE: Nombre de la base de datos a usar
-- MARIADB_USER: Usuario de la base de datos de mariadb. Será usada en el contenedor de maridb y de la aplicación de servidor de usbcommander
-- MARIADB_PASSWORD: Contraseña de la base de datos de mariadb. Será usada en el contenedor de maridb y de la aplicación de servidor de usbcommander
+- DATABASE_ROOT_PASSWORD: MariaDB root user password
+- USBCOMMANDER_DATABASE: Name of the database to use
+- MARIADB_USER: MariaDB database user. This is used in both the MariaDB container and the UsbCommander server application
+- MARIADB_PASSWORD: MariaDB database password. This is used in both the MariaDB container and the UsbCommander server application
 
-- DATABASE_URL: Dirección de la base de datos
-- SERVER_PORT: Puerto de la aplicación de servidor
-- SOCKET_PORT: Puerto a dedicar en la conexión por socket dedicada a las aplicaciones de cliente
-- JWT_SECRET: Clave a utilizar para la generación de los jwt que permitirán el acceso de los usuarios registrados.
-- REFRESH_TOKEN_LIFE: El tiempo de vida en segundos del token que se utilizará para generar los access token de los usuarios.
-- ACCESS_TOKEN_LIFE: El tiempo de vida en segundos del token que se usará para acceder a una cuenta.
-- LOG_ROUTE: Ruta en la que se generarán registros de errores ocurridos en las conexiones con las aplicaciones de clientes.
-- COOKIE_SECURE: True habilita las cookies seguras, false las deshabilita
-- SERVER_NAME: Nombre del servidor de nginx
+- DATABASE_URL: Database address
+- SERVER_PORT: Server application port
+- SOCKET_PORT: Port to dedicate to the socket connection used by client applications
+- JWT_SECRET: Key used to generate JWTs that allow access for registered users.
+- REFRESH_TOKEN_LIFE: Lifetime in seconds of the token used to generate the users' access tokens.
+- ACCESS_TOKEN_LIFE: Lifetime in seconds of the token used to access an account.
+- LOG_ROUTE: Path where error logs from client application connections will be generated.
+- COOKIE_SECURE: True enables secure cookies; false disables them
+- SERVER_NAME: Name of the NGINX server
 
-Este último campo es extremadamente importante, pues en función del valor definido, será necesario configurar y acceder a esa dirección para acceder a la página de la aplicación de Servidor de UsbCommander. En el caso de que no se quiera realizar la configuración, se puede hacer usso del nombre _, lo que permitirá acceder desde cualquier dirección que apunte a localhost. Sin embargo, si se desea configurar la dirección, será necesario editar el archivo ```/etc/hosts``` en el caso de linux, o ```C:\Windows\System32\drivers\etc\hosts``` en el caso de windows, y añadir la siguiente linea:
+This last field is extremely important, because depending on the value defined, it will be necessary to configure and access that address to reach the UsbCommander Server application page. If no configuration is desired, the underscore character `_` can be used, which will allow access from any address pointing to localhost. However, if the address needs to be configured, it will be necessary to edit the file ```/etc/hosts``` on Linux, or ```C:\Windows\System32\drivers\etc\hosts``` on Windows, and add the following line:
 ```
 127.0.0.1   usbcommander.server
 ```
-Reemplazando "usbcommander.server" por el nombre empleado.
+Replacing "usbcommander.server" with the name used.
 ![container_use_1](./server_images/server_image_1.png)
 ![container_use_2](./server_images/server_image_2.png)
